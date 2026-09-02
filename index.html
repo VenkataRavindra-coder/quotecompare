@@ -23,7 +23,7 @@
         <div class="h-8 w-8 rounded-lg bg-emerald-600 flex items-center justify-center font-black text-white text-lg shadow-lg shadow-emerald-500/30">FX</div>
         <div>
           <h1 class="text-sm font-bold tracking-tight text-white">QuoteCompare</h1>
-          <p class="text-xs text-slate-400">Multi-Currency Tender Normalization</p>
+          <p class="text-xs text-slate-400">Multi-Currency Tender Normalization (Global & Asia)</p>
         </div>
       </div>
 
@@ -43,16 +43,21 @@
       <div class="flex flex-wrap items-center justify-between gap-4">
         <div class="space-y-1">
           <input type="text" id="tenderTitle" onchange="updateProjectMeta('title', this.value)" class="bg-transparent text-lg font-bold text-white border-b border-transparent hover:border-slate-700 focus:border-emerald-500 focus:outline-none px-1 w-full md:w-[450px]" />
-          <p class="text-xs text-slate-400">All foreign supplier proposals are converted into the base evaluation currency in real time.</p>
+          <p class="text-xs text-slate-400">All foreign bids convert into the evaluation base currency automatically using baseline exchange rates.</p>
         </div>
         <div class="flex items-center gap-3 text-xs">
           <div class="bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700/60 flex items-center gap-2">
             <span class="text-slate-400">Evaluation Base:</span>
             <select id="baseCurrencySelect" onchange="changeBaseCurrency(this.value)" class="bg-slate-900 border border-slate-700 text-emerald-400 font-bold rounded px-2 py-0.5 outline-none">
+              <option value="AED">AED (AED)</option>
               <option value="USD">USD ($)</option>
+              <option value="INR">INR (₹)</option>
+              <option value="SAR">SAR (SAR)</option>
               <option value="EUR">EUR (€)</option>
               <option value="GBP">GBP (£)</option>
-              <option value="AED">AED (AED)</option>
+              <option value="SGD">SGD (S$)</option>
+              <option value="CNY">CNY (¥)</option>
+              <option value="JPY">JPY (¥)</option>
             </select>
           </div>
           <div class="bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700/60">
@@ -66,7 +71,7 @@
           <span class="font-bold text-slate-300">Baseline FX Rates</span>
           <span class="text-[11px] text-slate-500">(1 Foreign Unit = X Base Units)</span>
         </div>
-        <div id="fxRatesContainer" class="flex flex-wrap items-center gap-4"></div>
+        <div id="fxRatesContainer" class="flex flex-wrap items-center gap-3"></div>
       </div>
     </div>
 
@@ -74,10 +79,10 @@
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <div>
           <h2 class="text-sm font-semibold text-white">1. Evaluation Requirements & Gating Criteria</h2>
-          <p class="text-xs text-slate-400">Non-negotiable RFP terms must be set to "Mandatory" to eliminate non-compliant offers.</p>
+          <p class="text-xs text-slate-400">Non-negotiable RFP terms must be set to "Mandatory" to disqualify non-compliant suppliers.</p>
         </div>
         <div class="text-xs text-slate-400">
-          Weight Distribution: <span class="font-mono text-emerald-400">Cost 60% · Lead Time 10% · Warranty 10% · Advance Risk 10% · Specs 10%</span>
+          Weight: <span class="font-mono text-emerald-400">Cost 60% · Delivery 10% · Warranty 10% · Advance 10% · Tech 10%</span>
         </div>
       </div>
       <div id="requirementsContainer" class="grid grid-cols-1 md:grid-cols-5 gap-3"></div>
@@ -85,8 +90,8 @@
 
     <section class="space-y-4">
       <div class="flex items-center justify-between">
-        <h2 class="text-sm font-semibold text-white">2. Multi-Currency Supplier Offers & Scope Leveling</h2>
-        <span class="text-xs text-slate-400">Set each vendor's quoted currency independently. Adjustments convert automatically.</span>
+        <h2 class="text-sm font-semibold text-white">2. Multi-Currency Supplier Bids & Scope Leveling</h2>
+        <span class="text-xs text-slate-400">Select any Asian or Western currency per bidder. Adjustments calculate automatically.</span>
       </div>
       <div id="offersContainer" class="grid grid-cols-1 md:grid-cols-3 gap-5"></div>
     </section>
@@ -94,8 +99,8 @@
     <section class="bg-slate-900/60 border border-slate-800 rounded-xl p-5 space-y-4">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <div>
-          <h2 class="text-sm font-semibold text-white">3. Commercial Decision Matrix (Normalized to Base Currency)</h2>
-          <p class="text-xs text-slate-400">All prices converted to the base currency to ensure an accurate, defensible award decision.</p>
+          <h2 class="text-sm font-semibold text-white">3. Commercial Decision Matrix (Normalized)</h2>
+          <p class="text-xs text-slate-400">All proposals normalized to base currency for audit-grade award scoring.</p>
         </div>
       </div>
       <div id="evaluationSummary" class="space-y-4"></div>
@@ -114,14 +119,12 @@
       const proceed = confirm(
         "🔒 QuoteCompare Pro Feature: " + featureName + "\n\n" +
         "Upgrade for $29/month to access:\n" +
-        "• Unlimited Multi-Currency Projects\n" +
+        "• Unlimited Global & Asian Currency Pairs\n" +
         "• Executive PDF Tender Board Memo Export\n" +
-        "• Landed Cost & FX Normalization Engines\n\n" +
-        "Click OK to proceed to secure checkout."
+        "• Turnkey Landed Cost Normalization\n\n" +
+        "Click OK to proceed."
       );
-      if (proceed) {
-        window.open(STRIPE_CHECKOUT_URL, "_blank");
-      }
+      if (proceed) window.open(STRIPE_CHECKOUT_URL, "_blank");
     }
 
     function handleExportPDF() {
@@ -132,13 +135,36 @@
       window.print();
     }
 
-    const CURRENCY_SYMBOLS = { USD: "$", EUR: "€", GBP: "£", AED: "AED " };
-    const DEFAULT_RATES_TO_USD = { USD: 1.0, EUR: 1.08, GBP: 1.27, AED: 0.2723 };
+    const CURRENCY_SYMBOLS = {
+      AED: "AED ",
+      USD: "$",
+      INR: "₹",
+      SAR: "SAR ",
+      EUR: "€",
+      GBP: "£",
+      SGD: "S$",
+      CNY: "¥",
+      JPY: "¥"
+    };
+
+    const DEFAULT_RATES_TO_USD = {
+      USD: 1.0,
+      AED: 0.2723,
+      INR: 0.0105,
+      SAR: 0.2660,
+      EUR: 1.0800,
+      GBP: 1.2700,
+      SGD: 0.7600,
+      CNY: 0.1380,
+      JPY: 0.0068
+    };
+
+    const ALL_CURRENCIES = ["AED", "USD", "INR", "SAR", "EUR", "GBP", "SGD", "CNY", "JPY"];
 
     const DEFAULT_PROJECT = {
-      id: "proj_multicurrency_default",
-      title: "Global Equipment RFP — Multi-Currency Comparison",
-      baseCurrency: "USD",
+      id: "proj_asia_multicurrency_v1",
+      title: "Regional Plant RFP — Asia & GCC Supply Normalization",
+      baseCurrency: "AED",
       fxRates: { ...DEFAULT_RATES_TO_USD },
       requirements: [
         { id: 1, text: "24-Month Comprehensive Warranty", type: "mandatory" },
@@ -150,51 +176,51 @@
       offers: [
         {
           id: 1,
-          name: "Vendor Alpha (UK Supply)",
-          currency: "GBP",
-          headlinePrice: 85500,
-          deliveryDays: 56,
+          name: "Vendor Alpha (India EPC)",
+          currency: "INR",
+          headlinePrice: 8200000,
+          deliveryDays: 45,
           warrantyMonths: 24,
-          advancePercent: 30,
-          incoterm: "DDP (Trailer bed only)",
-          adjustments: [{ desc: "Local crane hire & rigging (GBP)", cost: 900 }],
-          compliance: { 1: "pass", 2: "fail", 3: "pass", 4: "pass", 5: "partial" }
+          advancePercent: 15,
+          incoterm: "CIF Jebel Ali",
+          adjustments: [
+            { desc: "Local UAE port customs clearance", cost: 120000 },
+            { desc: "Heavy transport to Abu Dhabi site", cost: 180000 }
+          ],
+          compliance: { 1: "pass", 2: "pass", 3: "pass", 4: "pass", 5: "pass" }
         },
         {
           id: 2,
-          name: "Vendor Beta (EU Warehouse)",
-          currency: "EUR",
-          headlinePrice: 89000,
-          deliveryDays: 3,
-          warrantyMonths: 12,
-          advancePercent: 100,
-          incoterm: "EXW Rotterdam",
-          adjustments: [
-            { desc: "International sea freight & insurance", cost: 3200 },
-            { desc: "Import duties & customs clearance", cost: 1800 },
-            { desc: "Local site transport & rigging", cost: 1200 },
-            { desc: "Commissioning engineer attendance", cost: 3500 },
-            { desc: "Year-2 extended warranty purchase", cost: 3800 }
-          ],
-          compliance: { 1: "fail", 2: "fail", 3: "fail", 4: "pass", 5: "fail" }
+          name: "Vendor Beta (KSA / Regional)",
+          currency: "SAR",
+          headlinePrice: 380000,
+          deliveryDays: 21,
+          warrantyMonths: 24,
+          advancePercent: 20,
+          incoterm: "DDP Jobsite",
+          adjustments: [],
+          compliance: { 1: "pass", 2: "pass", 3: "pass", 4: "pass", 5: "pass" }
         },
         {
           id: 3,
-          name: "Vendor Gamma (US / Direct)",
-          currency: "USD",
-          headlinePrice: 99350,
-          deliveryDays: 84,
-          warrantyMonths: 24,
-          advancePercent: 10,
-          incoterm: "DDP Plinth Mounted",
-          adjustments: [],
-          compliance: { 1: "pass", 2: "pass", 3: "pass", 4: "partial", 5: "pass" }
+          name: "Vendor Gamma (China Direct)",
+          currency: "CNY",
+          headlinePrice: 650000,
+          deliveryDays: 70,
+          warrantyMonths: 12,
+          advancePercent: 30,
+          incoterm: "FOB Shanghai",
+          adjustments: [
+            { desc: "Sea Freight & Marine Insurance", cost: 45000 },
+            { desc: "Local UAE Rigging & Crane Scope", cost: 25000 }
+          ],
+          compliance: { 1: "fail", 2: "fail", 3: "pass", 4: "partial", 5: "fail" }
         }
       ]
     };
 
-    const STORAGE_KEY = "quotecompare_projects_fx_v6";
-    const ACTIVE_KEY = "quotecompare_active_id_fx_v6";
+    const STORAGE_KEY = "quotecompare_projects_asia_v7";
+    const ACTIVE_KEY = "quotecompare_active_id_asia_v7";
 
     function getStoredProjects() {
       try {
@@ -234,7 +260,7 @@
       const sel = document.getElementById("projectSelect");
       sel.innerHTML = list.map(p => `<option value="${p.id}" ${p.id === currentProject.id ? "selected" : ""}>${p.title}</option>`).join("");
       document.getElementById("tenderTitle").value = currentProject.title;
-      document.getElementById("baseCurrencySelect").value = currentProject.baseCurrency || "USD";
+      document.getElementById("baseCurrencySelect").value = currentProject.baseCurrency || "AED";
     }
 
     function switchProject(id) {
@@ -262,24 +288,24 @@
         triggerPaywall("Unlimited Active Projects");
         return;
       }
-      const name = prompt("Enter Tender Project Name:", "New Multi-Currency Tender");
+      const name = prompt("Enter Project Name:", "New Regional Tender");
       if (!name) return;
       const newProj = {
         id: "proj_" + Date.now(),
         title: name,
-        baseCurrency: "USD",
+        baseCurrency: "AED",
         fxRates: { ...DEFAULT_RATES_TO_USD },
         requirements: [
-          { id: 1, text: "Mandatory Requirement 1", type: "mandatory" },
-          { id: 2, text: "Mandatory Delivery Term", type: "mandatory" },
-          { id: 3, text: "Commissioning & Support", type: "mandatory" },
-          { id: 4, text: "Lead Time Preference", type: "weighted" },
-          { id: 5, text: "Advance Payment Preference", type: "weighted" }
+          { id: 1, text: "24-Month Warranty", type: "mandatory" },
+          { id: 2, text: "Turnkey DDP Delivery", type: "mandatory" },
+          { id: 3, text: "Testing & Commissioning", type: "mandatory" },
+          { id: 4, text: "Lead Time Compliance", type: "weighted" },
+          { id: 5, text: "Payment Terms Compliance", type: "weighted" }
         ],
         offers: [
-          { id: 1, name: "Supplier 1", currency: "USD", headlinePrice: 0, deliveryDays: 30, warrantyMonths: 12, advancePercent: 20, incoterm: "DDP", adjustments: [], compliance: {1:"pass",2:"pass",3:"pass",4:"pass",5:"pass"} },
-          { id: 2, name: "Supplier 2", currency: "EUR", headlinePrice: 0, deliveryDays: 30, warrantyMonths: 12, advancePercent: 20, incoterm: "DDP", adjustments: [], compliance: {1:"pass",2:"pass",3:"pass",4:"pass",5:"pass"} },
-          { id: 3, name: "Supplier 3", currency: "GBP", headlinePrice: 0, deliveryDays: 30, warrantyMonths: 12, advancePercent: 20, incoterm: "DDP", adjustments: [], compliance: {1:"pass",2:"pass",3:"pass",4:"pass",5:"pass"} }
+          { id: 1, name: "Supplier 1", currency: "AED", headlinePrice: 0, deliveryDays: 30, warrantyMonths: 12, advancePercent: 20, incoterm: "DDP", adjustments: [], compliance: {1:"pass",2:"pass",3:"pass",4:"pass",5:"pass"} },
+          { id: 2, name: "Supplier 2", currency: "INR", headlinePrice: 0, deliveryDays: 30, warrantyMonths: 12, advancePercent: 20, incoterm: "CIF", adjustments: [], compliance: {1:"pass",2:"pass",3:"pass",4:"pass",5:"pass"} },
+          { id: 3, name: "Supplier 3", currency: "USD", headlinePrice: 0, deliveryDays: 30, warrantyMonths: 12, advancePercent: 20, incoterm: "EXW", adjustments: [], compliance: {1:"pass",2:"pass",3:"pass",4:"pass",5:"pass"} }
         ]
       };
       list.push(newProj);
@@ -319,37 +345,48 @@
 
     function convertToBase(amount, fromCurrency) {
       if (!amount || isNaN(amount)) return 0;
-      const base = currentProject.baseCurrency || "USD";
+      const base = currentProject.baseCurrency || "AED";
       if (fromCurrency === base) return Number(amount);
 
       const rates = currentProject.fxRates || DEFAULT_RATES_TO_USD;
-      const rateToUSD = rates[fromCurrency] || 1.0;
-      const baseRateToUSD = rates[base] || 1.0;
+      const rateToUSD = rates[fromCurrency] !== undefined ? rates[fromCurrency] : (DEFAULT_RATES_TO_USD[fromCurrency] || 1.0);
+      const baseRateToUSD = rates[base] !== undefined ? rates[base] : (DEFAULT_RATES_TO_USD[base] || 1.0);
 
       const inUSD = Number(amount) * rateToUSD;
       return inUSD / baseRateToUSD;
     }
 
+    function getDirectRateToBase(foreignCurr) {
+      const base = currentProject.baseCurrency || "AED";
+      const rates = currentProject.fxRates || DEFAULT_RATES_TO_USD;
+      const foreignToUSD = rates[foreignCurr] !== undefined ? rates[foreignCurr] : (DEFAULT_RATES_TO_USD[foreignCurr] || 1.0);
+      const baseToUSD = rates[base] !== undefined ? rates[base] : (DEFAULT_RATES_TO_USD[base] || 1.0);
+      return foreignToUSD / baseToUSD;
+    }
+
     function renderFXStrip() {
       const container = document.getElementById("fxRatesContainer");
-      const base = currentProject.baseCurrency || "USD";
-      const currencies = ["USD", "EUR", "GBP", "AED"].filter(c => c !== base);
+      const base = currentProject.baseCurrency || "AED";
+      const currencies = ALL_CURRENCIES.filter(c => c !== base);
 
       container.innerHTML = currencies.map(curr => {
-        const rate = (currentProject.fxRates && currentProject.fxRates[curr]) ? currentProject.fxRates[curr] : DEFAULT_RATES_TO_USD[curr];
+        const directRate = getDirectRateToBase(curr);
+        const displayVal = directRate >= 1 ? directRate.toFixed(4) : directRate.toFixed(5);
         return `
-          <div class="flex items-center gap-1.5 font-mono">
+          <div class="flex items-center gap-1.5 font-mono bg-slate-900 px-2 py-1 rounded border border-slate-800">
             <span class="text-slate-400">1 ${curr} =</span>
-            <input type="number" step="0.0001" value="${rate}" onchange="updateFXRate('${curr}', Number(this.value))" class="w-20 bg-slate-900 border border-slate-700 rounded px-1.5 py-0.5 text-right text-emerald-400 font-bold outline-none" />
+            <input type="number" step="0.0001" value="${displayVal}" onchange="updateDirectFX('${curr}', Number(this.value))" class="w-20 bg-slate-950 border border-slate-700 rounded px-1.5 py-0.5 text-right text-emerald-400 font-bold outline-none" />
             <span class="text-slate-500 text-[10px]">${base}</span>
           </div>
         `;
       }).join("");
     }
 
-    function updateFXRate(curr, val) {
+    function updateDirectFX(curr, rateToBase) {
       if (!currentProject.fxRates) currentProject.fxRates = { ...DEFAULT_RATES_TO_USD };
-      currentProject.fxRates[curr] = val;
+      const base = currentProject.baseCurrency || "AED";
+      const baseToUSD = currentProject.fxRates[base] !== undefined ? currentProject.fxRates[base] : DEFAULT_RATES_TO_USD[base];
+      currentProject.fxRates[curr] = rateToBase * baseToUSD;
       persistCurrent();
       renderOffers();
       calculateAndRenderSummary();
@@ -383,7 +420,7 @@
 
     function renderOffers() {
       const c = document.getElementById("offersContainer");
-      const base = currentProject.baseCurrency || "USD";
+      const base = currentProject.baseCurrency || "AED";
 
       c.innerHTML = currentProject.offers.map((offer, oIndex) => {
         const quotedCurr = offer.currency || base;
@@ -402,10 +439,7 @@
                 <div>
                   <label class="text-[10px] text-slate-400 block">Currency</label>
                   <select onchange="updateOfferField(${oIndex}, 'currency', this.value)" class="w-full bg-slate-950 border border-slate-800 rounded px-1.5 py-1 text-xs text-emerald-400 font-bold font-mono outline-none">
-                    <option value="USD" ${quotedCurr === 'USD' ? 'selected' : ''}>USD ($)</option>
-                    <option value="EUR" ${quotedCurr === 'EUR' ? 'selected' : ''}>EUR (€)</option>
-                    <option value="GBP" ${quotedCurr === 'GBP' ? 'selected' : ''}>GBP (£)</option>
-                    <option value="AED" ${quotedCurr === 'AED' ? 'selected' : ''}>AED</option>
+                    ${ALL_CURRENCIES.map(curr => `<option value="${curr}" ${quotedCurr === curr ? 'selected' : ''}>${curr} (${CURRENCY_SYMBOLS[curr].trim()})</option>`).join("")}
                   </select>
                 </div>
                 <div>
@@ -435,7 +469,7 @@
 
               <div class="bg-slate-950/80 border border-slate-800/80 rounded-lg p-3 space-y-2">
                 <div class="flex items-center justify-between text-xs">
-                  <span class="font-semibold text-slate-300">Landed Cost Adjustments</span>
+                  <span class="font-semibold text-slate-300">Landed Cost Scope Leveling</span>
                   <span class="font-mono text-emerald-400 font-bold">+${CURRENCY_SYMBOLS[quotedCurr]}${totalAdjustmentsNative.toLocaleString()}</span>
                 </div>
                 
@@ -500,7 +534,7 @@
 
     function addAdjustment(oIdx) {
       if (!currentProject.offers[oIdx].adjustments) currentProject.offers[oIdx].adjustments = [];
-      currentProject.offers[oIdx].adjustments.push({ desc: "Freight/Duties/Scope", cost: 0 });
+      currentProject.offers[oIdx].adjustments.push({ desc: "Customs/Rigging/Transport", cost: 0 });
       persistCurrent();
       renderOffers();
     }
@@ -519,7 +553,7 @@
 
     function calculateAndRenderSummary() {
       const summaryEl = document.getElementById("evaluationSummary");
-      const base = currentProject.baseCurrency || "USD";
+      const base = currentProject.baseCurrency || "AED";
       const reqs = currentProject.requirements;
 
       const offers = currentProject.offers.map(o => {
@@ -588,9 +622,9 @@
               <tr class="border-b border-slate-800 text-slate-400 bg-slate-950/60 font-semibold">
                 <th class="py-2.5 px-3">Supplier Offer</th>
                 <th class="py-2.5 px-3">Quoted Headline</th>
-                <th class="py-2.5 px-3">Adjustments</th>
-                <th class="py-2.5 px-3">Normalized (${base})</th>
-                <th class="py-2.5 px-3 text-center">Compliance</th>
+                <th class="py-2.5 px-3">Scope Offsets</th>
+                <th class="py-2.5 px-3">Normalized Landed (${base})</th>
+                <th class="py-2.5 px-3 text-center">RFP Compliance</th>
                 <th class="py-2.5 px-3 text-right">Composite Score</th>
                 <th class="py-2.5 px-3 text-center">Rank</th>
               </tr>
@@ -638,11 +672,11 @@
         html += `
           <div class="mt-4 p-4 bg-emerald-950/20 border border-emerald-800/50 rounded-xl space-y-2">
             <div class="flex items-center justify-between">
-              <h4 class="text-xs font-bold uppercase tracking-wider text-emerald-400">Executive Commercial Verdict</h4>
-              <span class="text-xs font-mono text-slate-400">FX-Normalized Tender Justification</span>
+              <h4 class="text-xs font-bold uppercase tracking-wider text-emerald-400">Tender Board Recommendation</h4>
+              <span class="text-xs font-mono text-slate-400">Asian & Regional Sourcing Matrix</span>
             </div>
             <p class="text-xs text-slate-200 leading-relaxed">
-              Award is recommended to <strong>${top.name}</strong> at a total evaluated contract price of <strong>${CURRENCY_SYMBOLS[base]}${top.evalCostInBase.toLocaleString()} ${base}</strong> (quoted at ${CURRENCY_SYMBOLS[top.quotedCurr]}${top.evalCostNative.toLocaleString()} ${top.quotedCurr}). Multi-currency normalization and landed cost leveling reveal this vendor as the lowest-risk compliant bidder under current foreign exchange rates.
+              Award is recommended to <strong>${top.name}</strong> at a total evaluated contract price of <strong>${CURRENCY_SYMBOLS[base]}${top.evalCostInBase.toLocaleString()} ${base}</strong> (quoted at ${CURRENCY_SYMBOLS[top.quotedCurr]}${top.evalCostNative.toLocaleString()} ${top.quotedCurr}).
             </p>
           </div>
         `;
@@ -663,7 +697,7 @@
       const params = new URLSearchParams(window.location.search);
       if (params.get("pro") === "active_multicurrency_lead") {
         localStorage.setItem(PRO_STATUS_KEY, "true");
-        alert("✓ QuoteCompare Pro (Multi-Currency Edition) unlocked!");
+        alert("✓ QuoteCompare Pro (Asia & Multi-Currency Edition) unlocked!");
       }
     }
 
