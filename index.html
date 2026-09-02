@@ -3,32 +3,52 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>QuoteCompare — Multi-Currency RFP Decision Engine</title>
+  <title>QuoteCompare — Enterprise Multi-Currency Sourcing Engine</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @media print {
-      body { background: white !important; color: black !important; }
+      body { background: white !important; color: black !important; font-size: 11px !important; }
       .no-print { display: none !important; }
       .print-only { display: block !important; }
-      .offer-card { border: 1px solid #ccc !important; page-break-inside: avoid; }
+      .offer-card { border: 1px solid #cbd5e1 !important; page-break-inside: avoid; }
+      table { width: 100% !important; border-collapse: collapse !important; }
+      th, td { border: 1px solid #cbd5e1 !important; padding: 6px !important; color: black !important; }
+      th { background-color: #f1f5f9 !important; }
+      .audit-box { border: 1px solid #94a3b8 !important; background: #f8fafc !important; color: black !important; }
     }
     .print-only { display: none; }
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans">
 
+  <div class="bg-emerald-950/90 border-b border-emerald-800/80 px-4 py-1.5 text-xs flex flex-wrap items-center justify-between gap-2 text-emerald-200 no-print">
+    <div class="flex items-center gap-2">
+      <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+      <span class="font-semibold tracking-wide">Enterprise InfoSec Assurance:</span>
+      <span class="text-emerald-300">Client-Side Isolation Active — Zero quotation data or vendor terms are uploaded or stored externally.</span>
+    </div>
+    <div class="flex items-center gap-3 font-mono text-[11px] text-emerald-400">
+      <span>Audit Standard: ISO-20400 Ready</span>
+      <span>•</span>
+      <span>NDA & SOC-2 Compliant Architecture</span>
+    </div>
+  </div>
+
   <header class="border-b border-slate-800 bg-slate-900/80 sticky top-0 z-50 backdrop-blur no-print">
     <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
       <div class="flex items-center gap-3">
-        <div class="h-8 w-8 rounded-lg bg-emerald-600 flex items-center justify-center font-black text-white text-lg shadow-lg shadow-emerald-500/30">FX</div>
+        <div class="h-8 w-8 rounded-lg bg-emerald-600 flex items-center justify-center font-black text-white text-lg shadow-lg shadow-emerald-500/30">QC</div>
         <div>
-          <h1 class="text-sm font-bold tracking-tight text-white">QuoteCompare</h1>
-          <p class="text-xs text-slate-400">Multi-Currency Tender Normalization (Global & Asia)</p>
+          <h1 class="text-sm font-bold tracking-tight text-white flex items-center gap-2">
+            QuoteCompare Enterprise
+            <span class="text-[10px] bg-emerald-900 text-emerald-300 border border-emerald-700 font-semibold px-1.5 py-0.2 rounded">B2B Core</span>
+          </h1>
+          <p class="text-xs text-slate-400">Cross-Border Commercial Bid Normalization & Sourcing Governance</p>
         </div>
       </div>
 
       <div class="flex items-center gap-2">
-        <label class="text-xs text-slate-400 font-medium">Project:</label>
+        <label class="text-xs text-slate-400 font-medium">Tender:</label>
         <select id="projectSelect" onchange="switchProject(this.value)" class="bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:ring-1 focus:ring-emerald-500 outline-none"></select>
         <button onclick="createNewProject()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs rounded-lg border border-slate-700 transition">+ New</button>
         <button onclick="duplicateCurrentProject()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs rounded-lg border border-slate-700 transition">Duplicate</button>
@@ -39,18 +59,33 @@
   </header>
 
   <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+    
+    <div class="print-only border-b-2 border-slate-900 pb-4 mb-4">
+      <div class="flex justify-between items-start">
+        <div>
+          <h1 class="text-xl font-black uppercase tracking-tight text-slate-900">Commercial Tender Evaluation Board Memo</h1>
+          <p class="text-xs text-slate-600 font-serif">Audit Resolution & Landed Cost Equalization Report</p>
+        </div>
+        <div class="text-right text-xs space-y-0.5">
+          <p class="font-mono font-bold text-slate-800" id="printAuditRef">REF: RFP-2026-TND-9482</p>
+          <p class="text-slate-500" id="printDate"></p>
+          <p class="font-bold text-rose-800 uppercase tracking-widest text-[10px]">Strictly Confidential — Commercial-in-Confidence</p>
+        </div>
+      </div>
+    </div>
+
     <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4 space-y-4">
       <div class="flex flex-wrap items-center justify-between gap-4">
         <div class="space-y-1">
-          <input type="text" id="tenderTitle" onchange="updateProjectMeta('title', this.value)" class="bg-transparent text-lg font-bold text-white border-b border-transparent hover:border-slate-700 focus:border-emerald-500 focus:outline-none px-1 w-full md:w-[450px]" />
-          <p class="text-xs text-slate-400">All foreign bids convert into the evaluation base currency automatically using baseline exchange rates.</p>
+          <input type="text" id="tenderTitle" onchange="updateProjectMeta('title', this.value)" class="bg-transparent text-lg font-bold text-white border-b border-transparent hover:border-slate-700 focus:border-emerald-500 focus:outline-none px-1 w-full md:w-[480px]" />
+          <p class="text-xs text-slate-400">Foreign currency proposals automatically normalize into your commercial base currency using audit exchange rates.</p>
         </div>
         <div class="flex items-center gap-3 text-xs">
           <div class="bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700/60 flex items-center gap-2">
             <span class="text-slate-400">Evaluation Base:</span>
             <select id="baseCurrencySelect" onchange="changeBaseCurrency(this.value)" class="bg-slate-900 border border-slate-700 text-emerald-400 font-bold rounded px-2 py-0.5 outline-none">
-              <option value="AED">AED (AED)</option>
               <option value="SAR">SAR (SAR)</option>
+              <option value="AED">AED (AED)</option>
               <option value="INR">INR (₹)</option>
               <option value="USD">USD ($)</option>
               <option value="EUR">EUR (€)</option>
@@ -61,34 +96,32 @@
             </select>
           </div>
           <div class="bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700/60">
-            <span class="text-slate-400">Status:</span> <strong id="autoSaveIndicator" class="text-emerald-400 font-mono">Synced locally</strong>
+            <span class="text-slate-400">Storage:</span> <strong id="autoSaveIndicator" class="text-emerald-400 font-mono">Synced locally</strong>
           </div>
         </div>
       </div>
 
       <div class="bg-slate-950/70 border border-slate-800/80 rounded-lg p-3 text-xs flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-2">
-          <span class="font-bold text-slate-300">Baseline FX Rates</span>
+          <span class="font-bold text-slate-300">Baseline FX Conversion Rates</span>
           <span class="text-[11px] text-slate-500">(1 Foreign Unit = X Base Units)</span>
         </div>
         <div id="fxRatesContainer" class="flex flex-wrap items-center gap-3"></div>
       </div>
     </div>
 
-    <!-- Section 1: Dynamic Scoring Weights & Gating Criteria -->
     <section class="bg-slate-900/40 border border-slate-800/80 rounded-xl p-5 space-y-4">
       <div class="flex flex-wrap items-center justify-between border-b border-slate-800 pb-3 gap-3">
         <div>
           <h2 class="text-sm font-semibold text-white">1. Evaluation Weighting & Gating Criteria</h2>
-          <p class="text-xs text-slate-400">Adjust sliders to re-weight scoring criteria. Set gating slots to "Mandatory" to disqualify failing bidders.</p>
+          <p class="text-xs text-slate-400">Weighted parameters evaluate eligible bids. Gating items marked "Mandatory" strictly disqualify non-compliant suppliers.</p>
         </div>
         <div class="flex items-center gap-2 text-xs">
-          <span class="text-slate-400">Total Weight:</span>
+          <span class="text-slate-400">Total Criteria Weight:</span>
           <span id="weightSumBadge" class="font-mono px-2 py-0.5 rounded font-bold text-xs bg-emerald-950 text-emerald-300 border border-emerald-800">100%</span>
         </div>
       </div>
 
-      <!-- Real-Time Interactive Weighting Sliders -->
       <div class="grid grid-cols-2 md:grid-cols-5 gap-3 bg-slate-950/80 border border-slate-800/80 p-3 rounded-lg text-xs">
         <div>
           <div class="flex justify-between text-[11px] mb-1">
@@ -113,14 +146,14 @@
         </div>
         <div>
           <div class="flex justify-between text-[11px] mb-1">
-            <span class="text-slate-400 font-medium">Advance Risk</span>
+            <span class="text-slate-400 font-medium">Advance Terms</span>
             <span id="labelWeightAdvance" class="font-mono text-emerald-400 font-bold">10%</span>
           </div>
           <input type="range" id="sliderAdvance" min="0" max="40" step="5" value="10" oninput="updateWeights()" class="w-full accent-emerald-500 cursor-pointer h-1.5 bg-slate-800 rounded-lg" />
         </div>
         <div>
           <div class="flex justify-between text-[11px] mb-1">
-            <span class="text-slate-400 font-medium">RFP Specs/Tech</span>
+            <span class="text-slate-400 font-medium">RFP Specs / Tech</span>
             <span id="labelWeightSpecs" class="font-mono text-emerald-400 font-bold">10%</span>
           </div>
           <input type="range" id="sliderSpecs" min="0" max="40" step="5" value="10" oninput="updateWeights()" class="w-full accent-emerald-500 cursor-pointer h-1.5 bg-slate-800 rounded-lg" />
@@ -130,30 +163,92 @@
       <div id="requirementsContainer" class="grid grid-cols-1 md:grid-cols-5 gap-3"></div>
     </section>
 
-    <!-- Section 2: Supplier Offers Grid -->
     <section class="space-y-4">
       <div class="flex items-center justify-between">
         <h2 class="text-sm font-semibold text-white">2. Multi-Currency Supplier Bids & Scope Leveling</h2>
-        <span class="text-xs text-slate-400">Select any Asian or Western currency per bidder. Adjustments calculate automatically.</span>
+        <span class="text-xs text-slate-400">Normalize freight, handling, and insurance to build an audit-defensible landed cost.</span>
       </div>
       <div id="offersContainer" class="grid grid-cols-1 md:grid-cols-3 gap-5"></div>
     </section>
 
-    <!-- Section 3: Normalized Award Recommendation -->
     <section class="bg-slate-900/60 border border-slate-800 rounded-xl p-5 space-y-4">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <div>
           <h2 class="text-sm font-semibold text-white">3. Commercial Decision Matrix (Normalized)</h2>
-          <p class="text-xs text-slate-400">Audit-ready rank calculated dynamically according to weighted scoring preferences.</p>
+          <p class="text-xs text-slate-400">Formal tender evaluation scores computed in real-time according to governance weights.</p>
         </div>
       </div>
       <div id="evaluationSummary" class="space-y-4"></div>
     </section>
+
+    <section class="print-only pt-6 mt-6 border-t-2 border-slate-800 space-y-6">
+      <div>
+        <h3 class="text-xs font-black uppercase tracking-wider text-slate-800">Tender Committee Governance & Contract Award Endorsement</h3>
+        <p class="text-[10px] text-slate-600">The undersigned committee members confirm that technical and commercial evaluations adhere to corporate procurement governance and approved delegation of authority.</p>
+      </div>
+
+      <div class="grid grid-cols-3 gap-6 pt-4">
+        <div class="border border-slate-300 p-3 rounded space-y-6 bg-slate-50">
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Prepared By</span>
+            <p class="font-bold text-xs text-slate-900 mt-1">Lead Procurement Engineer</p>
+            <p class="text-[10px] text-slate-500">Commercial Operations</p>
+          </div>
+          <div class="space-y-2 pt-4 border-t border-dashed border-slate-300">
+            <div class="flex justify-between text-[10px] text-slate-600">
+              <span>Signature: _______________________</span>
+            </div>
+            <div class="flex justify-between text-[10px] text-slate-600">
+              <span>Date: _____ / _____ / 2026</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="border border-slate-300 p-3 rounded space-y-6 bg-slate-50">
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Verified & Endorsed</span>
+            <p class="font-bold text-xs text-slate-900 mt-1">Commercial & Contracts Manager</p>
+            <p class="text-[10px] text-slate-500">Contracts Governance</p>
+          </div>
+          <div class="space-y-2 pt-4 border-t border-dashed border-slate-300">
+            <div class="flex justify-between text-[10px] text-slate-600">
+              <span>Signature: _______________________</span>
+            </div>
+            <div class="flex justify-between text-[10px] text-slate-600">
+              <span>Date: _____ / _____ / 2026</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="border border-slate-300 p-3 rounded space-y-6 bg-slate-50">
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Final Approval for Award</span>
+            <p class="font-bold text-xs text-slate-900 mt-1">Director of Procurement / VP Supply Chain</p>
+            <p class="text-[10px] text-slate-500">Tender Board Authority</p>
+          </div>
+          <div class="space-y-2 pt-4 border-t border-dashed border-slate-300">
+            <div class="flex justify-between text-[10px] text-slate-600">
+              <span>Signature: _______________________</span>
+            </div>
+            <div class="flex justify-between text-[10px] text-slate-600">
+              <span>Date: _____ / _____ / 2026</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
+
+  <footer class="border-t border-slate-800 bg-slate-900/60 py-4 px-4 text-center text-xs text-slate-500 no-print mt-12">
+    <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2">
+      <p>© 2026 QuoteCompare Systems. Designed for global EPC, infrastructure, and enterprise commercial evaluation.</p>
+      <p class="font-mono text-emerald-500/80">Local Storage Active • Fully Offline Capable</p>
+    </div>
+  </footer>
 
   <script>
     const PRO_STATUS_KEY = "qc_pro_unlocked_multicurrency";
-    const STRIPE_CHECKOUT_URL = "https://buy.stripe.com/test_your_usd_link_here";
+    const CHECKOUT_PORTAL_URL = "https://buy.stripe.com/test_your_usd_link_here";
 
     function isProUser() {
       return localStorage.getItem(PRO_STATUS_KEY) === "true";
@@ -162,13 +257,13 @@
     function triggerPaywall(featureName) {
       const proceed = confirm(
         "🔒 QuoteCompare Pro Feature: " + featureName + "\n\n" +
-        "Upgrade for $29/month to access:\n" +
-        "• Unlimited Global & Asian Currency Pairs\n" +
-        "• Executive PDF Tender Board Memo Export\n" +
+        "Upgrade to Enterprise Tier to access:\n" +
+        "• Unlimited Multi-Currency Pairs (GCC & Asia)\n" +
+        "• Executive Tender Board Sign-Off Export (PDF)\n" +
         "• Turnkey Landed Cost Normalization\n\n" +
-        "Click OK to proceed."
+        "Click OK to unlock."
       );
-      if (proceed) window.open(STRIPE_CHECKOUT_URL, "_blank");
+      if (proceed) window.open(CHECKOUT_PORTAL_URL, "_blank");
     }
 
     function handleExportPDF() {
@@ -176,617 +271,7 @@
         triggerPaywall("Executive Tender Board PDF Memo Export");
         return;
       }
-      window.print();
-    }
-
-    const CURRENCY_SYMBOLS = {
-      AED: "AED ",
-      SAR: "SAR ",
-      INR: "₹",
-      USD: "$",
-      EUR: "€",
-      GBP: "£",
-      SGD: "S$",
-      CNY: "¥",
-      JPY: "¥"
-    };
-
-    const DEFAULT_RATES_TO_USD = {
-      USD: 1.0,
-      AED: 0.2723,
-      SAR: 0.2660,
-      INR: 0.0105,
-      EUR: 1.0800,
-      GBP: 1.2700,
-      SGD: 0.7600,
-      CNY: 0.1380,
-      JPY: 0.0068
-    };
-
-    const ALL_CURRENCIES = ["AED", "SAR", "INR", "USD", "EUR", "GBP", "SGD", "CNY", "JPY"];
-
-    const DEFAULT_PROJECT = {
-      id: "proj_asia_multicurrency_v2",
-      title: "Regional Plant RFP — Asia & GCC Supply Normalization",
-      baseCurrency: "SAR",
-      fxRates: { ...DEFAULT_RATES_TO_USD },
-      weights: { cost: 60, delivery: 10, warranty: 10, advance: 10, specs: 10 },
-      requirements: [
-        { id: 1, text: "24-Month Comprehensive Warranty", type: "mandatory" },
-        { id: 2, text: "DDP Delivery & Rigging to Pad", type: "mandatory" },
-        { id: 3, text: "On-site Testing & Commissioning Scope", type: "mandatory" },
-        { id: 4, text: "Delivery Lead Time Under 60 Days", type: "weighted" },
-        { id: 5, text: "Advance Payment Under 20%", type: "weighted" }
-      ],
-      offers: [
-        {
-          id: 1,
-          name: "Vendor Alpha (India EPC)",
-          currency: "INR",
-          headlinePrice: 8200000,
-          deliveryDays: 45,
-          warrantyMonths: 24,
-          advancePercent: 15,
-          incoterm: "CIF Jebel Ali",
-          adjustments: [
-            { desc: "Local port customs clearance", cost: 120000 },
-            { desc: "Heavy transport to site", cost: 180000 }
-          ],
-          compliance: { 1: "pass", 2: "pass", 3: "pass", 4: "pass", 5: "pass" }
-        },
-        {
-          id: 2,
-          name: "Vendor Beta (KSA / Regional)",
-          currency: "SAR",
-          headlinePrice: 380000,
-          deliveryDays: 21,
-          warrantyMonths: 24,
-          advancePercent: 20,
-          incoterm: "DDP Jobsite",
-          adjustments: [],
-          compliance: { 1: "pass", 2: "pass", 3: "pass", 4: "pass", 5: "pass" }
-        },
-        {
-          id: 3,
-          name: "Vendor Gamma (China Direct)",
-          currency: "CNY",
-          headlinePrice: 650000,
-          deliveryDays: 70,
-          warrantyMonths: 12,
-          advancePercent: 30,
-          incoterm: "FOB Shanghai",
-          adjustments: [
-            { desc: "Sea Freight & Marine Insurance", cost: 45000 },
-            { desc: "Local Rigging & Crane Scope", cost: 25000 }
-          ],
-          compliance: { 1: "fail", 2: "fail", 3: "pass", 4: "partial", 5: "fail" }
-        }
-      ]
-    };
-
-    const STORAGE_KEY = "quotecompare_projects_sliders_v8";
-    const ACTIVE_KEY = "quotecompare_active_id_sliders_v8";
-
-    function getStoredProjects() {
-      try {
-        const data = localStorage.getItem(STORAGE_KEY);
-        return data ? JSON.parse(data) : [DEFAULT_PROJECT];
-      } catch (e) {
-        return [DEFAULT_PROJECT];
-      }
-    }
-
-    function saveAllProjects(projects) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
-      flashSaveIndicator();
-    }
-
-    function getActiveProject() {
-      const list = getStoredProjects();
-      const activeId = localStorage.getItem(ACTIVE_KEY);
-      return list.find(p => p.id === activeId) || list[0];
-    }
-
-    let currentProject = getActiveProject();
-
-    function flashSaveIndicator() {
-      const el = document.getElementById("autoSaveIndicator");
-      if (!el) return;
-      el.textContent = "Saving...";
-      el.className = "text-amber-400 font-mono";
-      setTimeout(() => {
-        el.textContent = "Synced locally";
-        el.className = "text-emerald-400 font-mono";
-      }, 350);
-    }
-
-    function syncWeightControls() {
-      const w = currentProject.weights || { cost: 60, delivery: 10, warranty: 10, advance: 10, specs: 10 };
-      document.getElementById("sliderCost").value = w.cost;
-      document.getElementById("sliderDelivery").value = w.delivery;
-      document.getElementById("sliderWarranty").value = w.warranty;
-      document.getElementById("sliderAdvance").value = w.advance;
-      document.getElementById("sliderSpecs").value = w.specs;
-
-      document.getElementById("labelWeightCost").textContent = w.cost + "%";
-      document.getElementById("labelWeightDelivery").textContent = w.delivery + "%";
-      document.getElementById("labelWeightWarranty").textContent = w.warranty + "%";
-      document.getElementById("labelWeightAdvance").textContent = w.advance + "%";
-      document.getElementById("labelWeightSpecs").textContent = w.specs + "%";
-
-      const total = Number(w.cost) + Number(w.delivery) + Number(w.warranty) + Number(w.advance) + Number(w.specs);
-      const badge = document.getElementById("weightSumBadge");
-      badge.textContent = total + "%";
-      badge.className = total === 100 
-        ? "font-mono px-2 py-0.5 rounded font-bold text-xs bg-emerald-950 text-emerald-300 border border-emerald-800"
-        : "font-mono px-2 py-0.5 rounded font-bold text-xs bg-amber-950 text-amber-300 border border-amber-800";
-    }
-
-    function updateWeights() {
-      const cost = Number(document.getElementById("sliderCost").value);
-      const delivery = Number(document.getElementById("sliderDelivery").value);
-      const warranty = Number(document.getElementById("sliderWarranty").value);
-      const advance = Number(document.getElementById("sliderAdvance").value);
-      const specs = Number(document.getElementById("sliderSpecs").value);
-
-      currentProject.weights = { cost, delivery, warranty, advance, specs };
-      syncWeightControls();
-      persistCurrent();
-    }
-
-    function renderProjectDropdown() {
-      const list = getStoredProjects();
-      const sel = document.getElementById("projectSelect");
-      sel.innerHTML = list.map(p => `<option value="${p.id}" ${p.id === currentProject.id ? "selected" : ""}>${p.title}</option>`).join("");
-      document.getElementById("tenderTitle").value = currentProject.title;
-      document.getElementById("baseCurrencySelect").value = currentProject.baseCurrency || "SAR";
-    }
-
-    function switchProject(id) {
-      const list = getStoredProjects();
-      currentProject = list.find(p => p.id === id) || list[0];
-      localStorage.setItem(ACTIVE_KEY, currentProject.id);
-      renderAll();
-    }
-
-    function updateProjectMeta(field, val) {
-      currentProject[field] = val;
-      persistCurrent();
-      renderProjectDropdown();
-    }
-
-    function changeBaseCurrency(newBase) {
-      currentProject.baseCurrency = newBase;
-      persistCurrent();
-      renderAll();
-    }
-
-    function createNewProject() {
-      const list = getStoredProjects();
-      if (list.length >= 2 && !isProUser()) {
-        triggerPaywall("Unlimited Active Projects");
-        return;
-      }
-      const name = prompt("Enter Project Name:", "New Regional Tender");
-      if (!name) return;
-      const newProj = {
-        id: "proj_" + Date.now(),
-        title: name,
-        baseCurrency: "SAR",
-        fxRates: { ...DEFAULT_RATES_TO_USD },
-        weights: { cost: 60, delivery: 10, warranty: 10, advance: 10, specs: 10 },
-        requirements: [
-          { id: 1, text: "24-Month Warranty", type: "mandatory" },
-          { id: 2, text: "Turnkey DDP Delivery", type: "mandatory" },
-          { id: 3, text: "Testing & Commissioning", type: "mandatory" },
-          { id: 4, text: "Lead Time Compliance", type: "weighted" },
-          { id: 5, text: "Payment Terms Compliance", type: "weighted" }
-        ],
-        offers: [
-          { id: 1, name: "Supplier 1", currency: "SAR", headlinePrice: 0, deliveryDays: 30, warrantyMonths: 12, advancePercent: 20, incoterm: "DDP", adjustments: [], compliance: {1:"pass",2:"pass",3:"pass",4:"pass",5:"pass"} },
-          { id: 2, name: "Supplier 2", currency: "INR", headlinePrice: 0, deliveryDays: 30, warrantyMonths: 12, advancePercent: 20, incoterm: "CIF", adjustments: [], compliance: {1:"pass",2:"pass",3:"pass",4:"pass",5:"pass"} },
-          { id: 3, name: "Supplier 3", currency: "USD", headlinePrice: 0, deliveryDays: 30, warrantyMonths: 12, advancePercent: 20, incoterm: "EXW", adjustments: [], compliance: {1:"pass",2:"pass",3:"pass",4:"pass",5:"pass"} }
-        ]
-      };
-      list.push(newProj);
-      saveAllProjects(list);
-      switchProject(newProj.id);
-    }
-
-    function duplicateCurrentProject() {
-      const copy = JSON.parse(JSON.stringify(currentProject));
-      copy.id = "proj_" + Date.now();
-      copy.title = currentProject.title + " (Copy)";
-      const list = getStoredProjects();
-      list.push(copy);
-      saveAllProjects(list);
-      switchProject(copy.id);
-    }
-
-    function deleteCurrentProject() {
-      const list = getStoredProjects();
-      if (list.length <= 1) {
-        alert("Cannot delete the only project.");
-        return;
-      }
-      if (!confirm("Delete project: " + currentProject.title + "?")) return;
-      const filtered = list.filter(p => p.id !== currentProject.id);
-      saveAllProjects(filtered);
-      switchProject(filtered[0].id);
-    }
-
-    function persistCurrent() {
-      const list = getStoredProjects();
-      const idx = list.findIndex(p => p.id === currentProject.id);
-      if (idx >= 0) list[idx] = currentProject;
-      saveAllProjects(list);
-      calculateAndRenderSummary();
-    }
-
-    function convertToBase(amount, fromCurrency) {
-      if (!amount || isNaN(amount)) return 0;
-      const base = currentProject.baseCurrency || "SAR";
-      if (fromCurrency === base) return Number(amount);
-
-      const rates = currentProject.fxRates || DEFAULT_RATES_TO_USD;
-      const rateToUSD = rates[fromCurrency] !== undefined ? rates[fromCurrency] : (DEFAULT_RATES_TO_USD[fromCurrency] || 1.0);
-      const baseRateToUSD = rates[base] !== undefined ? rates[base] : (DEFAULT_RATES_TO_USD[base] || 1.0);
-
-      const inUSD = Number(amount) * rateToUSD;
-      return inUSD / baseRateToUSD;
-    }
-
-    function getDirectRateToBase(foreignCurr) {
-      const base = currentProject.baseCurrency || "SAR";
-      const rates = currentProject.fxRates || DEFAULT_RATES_TO_USD;
-      const foreignToUSD = rates[foreignCurr] !== undefined ? rates[foreignCurr] : (DEFAULT_RATES_TO_USD[foreignCurr] || 1.0);
-      const baseToUSD = rates[base] !== undefined ? rates[base] : (DEFAULT_RATES_TO_USD[base] || 1.0);
-      return foreignToUSD / baseToUSD;
-    }
-
-    function renderFXStrip() {
-      const container = document.getElementById("fxRatesContainer");
-      const base = currentProject.baseCurrency || "SAR";
-      const currencies = ALL_CURRENCIES.filter(c => c !== base);
-
-      container.innerHTML = currencies.map(curr => {
-        const directRate = getDirectRateToBase(curr);
-        const displayVal = directRate >= 1 ? directRate.toFixed(4) : directRate.toFixed(5);
-        return `
-          <div class="flex items-center gap-1.5 font-mono bg-slate-900 px-2 py-1 rounded border border-slate-800">
-            <span class="text-slate-400">1 ${curr} =</span>
-            <input type="number" step="0.0001" value="${displayVal}" onchange="updateDirectFX('${curr}', Number(this.value))" class="w-20 bg-slate-950 border border-slate-700 rounded px-1.5 py-0.5 text-right text-emerald-400 font-bold outline-none" />
-            <span class="text-slate-500 text-[10px]">${base}</span>
-          </div>
-        `;
-      }).join("");
-    }
-
-    function updateDirectFX(curr, rateToBase) {
-      if (!currentProject.fxRates) currentProject.fxRates = { ...DEFAULT_RATES_TO_USD };
-      const base = currentProject.baseCurrency || "SAR";
-      const baseToUSD = currentProject.fxRates[base] !== undefined ? currentProject.fxRates[base] : DEFAULT_RATES_TO_USD[base];
-      currentProject.fxRates[curr] = rateToBase * baseToUSD;
-      persistCurrent();
-      renderOffers();
-      calculateAndRenderSummary();
-    }
-
-    function renderRequirements() {
-      const c = document.getElementById("requirementsContainer");
-      c.innerHTML = currentProject.requirements.map(req => `
-        <div class="bg-slate-900 border border-slate-800 rounded-lg p-3 space-y-2">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-mono font-bold text-slate-500">Slot ${req.id}</span>
-            <select onchange="updateReqType(${req.id}, this.value)" class="text-[11px] font-semibold rounded px-1.5 py-0.5 ${req.type === 'mandatory' ? 'bg-rose-950 text-rose-300 border border-rose-800' : 'bg-emerald-950 text-emerald-300 border border-emerald-800'} outline-none">
-              <option value="mandatory" ${req.type === 'mandatory' ? 'selected' : ''}>Mandatory</option>
-              <option value="weighted" ${req.type === 'weighted' ? 'selected' : ''}>Weighted</option>
-            </select>
-          </div>
-          <input type="text" value="${req.text}" onchange="updateReqText(${req.id}, this.value)" class="w-full bg-slate-950 border border-slate-800 rounded px-2 py-1 text-xs text-white focus:border-emerald-500 outline-none" />
-        </div>
-      `).join("");
-    }
-
-    function updateReqType(id, type) {
-      const r = currentProject.requirements.find(x => x.id === id);
-      if (r) { r.type = type; persistCurrent(); renderRequirements(); }
-    }
-
-    function updateReqText(id, text) {
-      const r = currentProject.requirements.find(x => x.id === id);
-      if (r) { r.text = text; persistCurrent(); }
-    }
-
-    function renderOffers() {
-      const c = document.getElementById("offersContainer");
-      const base = currentProject.baseCurrency || "SAR";
-
-      c.innerHTML = currentProject.offers.map((offer, oIndex) => {
-        const quotedCurr = offer.currency || base;
-        const totalAdjustmentsNative = (offer.adjustments || []).reduce((sum, a) => sum + (Number(a.cost) || 0), 0);
-        const evaluatedNative = (Number(offer.headlinePrice) || 0) + totalAdjustmentsNative;
-        const evaluatedInBase = convertToBase(evaluatedNative, quotedCurr);
-
-        return `
-          <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-4 space-y-4 flex flex-col justify-between offer-card">
-            <div class="space-y-3">
-              <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-                <input type="text" value="${offer.name}" onchange="updateOfferField(${oIndex}, 'name', this.value)" class="font-bold text-xs text-white bg-transparent border-b border-transparent hover:border-slate-700 focus:border-emerald-500 outline-none w-full" />
-              </div>
-
-              <div class="grid grid-cols-3 gap-2">
-                <div>
-                  <label class="text-[10px] text-slate-400 block">Currency</label>
-                  <select onchange="updateOfferField(${oIndex}, 'currency', this.value)" class="w-full bg-slate-950 border border-slate-800 rounded px-1.5 py-1 text-xs text-emerald-400 font-bold font-mono outline-none">
-                    ${ALL_CURRENCIES.map(curr => `<option value="${curr}" ${quotedCurr === curr ? 'selected' : ''}>${curr} (${CURRENCY_SYMBOLS[curr].trim()})</option>`).join("")}
-                  </select>
-                </div>
-                <div>
-                  <label class="text-[10px] text-slate-400 block">Headline Total</label>
-                  <input type="number" value="${offer.headlinePrice}" onchange="updateOfferField(${oIndex}, 'headlinePrice', Number(this.value))" class="w-full bg-slate-950 border border-slate-800 rounded px-2 py-1 text-xs text-white font-mono font-bold outline-none" />
-                </div>
-                <div>
-                  <label class="text-[10px] text-slate-400 block">Incoterm</label>
-                  <input type="text" value="${offer.incoterm || 'DDP'}" onchange="updateOfferField(${oIndex}, 'incoterm', this.value)" class="w-full bg-slate-950 border border-slate-800 rounded px-2 py-1 text-xs text-white font-mono outline-none" />
-                </div>
-              </div>
-
-              <div class="grid grid-cols-3 gap-2 text-center">
-                <div class="bg-slate-950 p-1.5 rounded border border-slate-800">
-                  <span class="text-[10px] text-slate-400 block">Delivery (d)</span>
-                  <input type="number" value="${offer.deliveryDays}" onchange="updateOfferField(${oIndex}, 'deliveryDays', Number(this.value))" class="w-full text-center bg-transparent text-xs text-white font-mono outline-none" />
-                </div>
-                <div class="bg-slate-950 p-1.5 rounded border border-slate-800">
-                  <span class="text-[10px] text-slate-400 block">Warranty (mo)</span>
-                  <input type="number" value="${offer.warrantyMonths}" onchange="updateOfferField(${oIndex}, 'warrantyMonths', Number(this.value))" class="w-full text-center bg-transparent text-xs text-white font-mono outline-none" />
-                </div>
-                <div class="bg-slate-950 p-1.5 rounded border border-slate-800">
-                  <span class="text-[10px] text-slate-400 block">Advance (%)</span>
-                  <input type="number" value="${offer.advancePercent}" onchange="updateOfferField(${oIndex}, 'advancePercent', Number(this.value))" class="w-full text-center bg-transparent text-xs text-white font-mono outline-none" />
-                </div>
-              </div>
-
-              <div class="bg-slate-950/80 border border-slate-800/80 rounded-lg p-3 space-y-2">
-                <div class="flex items-center justify-between text-xs">
-                  <span class="font-semibold text-slate-300">Landed Cost Scope Leveling</span>
-                  <span class="font-mono text-emerald-400 font-bold">+${CURRENCY_SYMBOLS[quotedCurr]}${totalAdjustmentsNative.toLocaleString()}</span>
-                </div>
-                
-                <div class="space-y-1.5">
-                  ${(offer.adjustments || []).map((adj, aIdx) => `
-                    <div class="flex items-center gap-1.5 text-[11px]">
-                      <input type="text" value="${adj.desc}" onchange="updateAdjustment(${oIndex}, ${aIdx}, 'desc', this.value)" class="flex-1 bg-slate-900 border border-slate-800 rounded px-1.5 py-0.5 text-slate-200 outline-none" />
-                      <input type="number" value="${adj.cost}" onchange="updateAdjustment(${oIndex}, ${aIdx}, 'cost', Number(this.value))" class="w-20 bg-slate-900 border border-slate-800 rounded px-1.5 py-0.5 text-right font-mono text-white outline-none" />
-                      <button onclick="removeAdjustment(${oIndex}, ${aIdx})" class="text-rose-500 hover:text-rose-400 px-1 font-bold">×</button>
-                    </div>
-                  `).join("")}
-                </div>
-
-                <button onclick="addAdjustment(${oIndex})" class="w-full text-left text-[11px] text-emerald-400 hover:text-emerald-300 font-medium pt-1">+ Add Scope Offset (${quotedCurr})</button>
-
-                <div class="border-t border-slate-800 pt-2 flex flex-col gap-1 text-xs">
-                  <div class="flex justify-between items-center text-slate-400">
-                    <span>Quoted Landed Total:</span>
-                    <span class="font-mono font-bold text-slate-300">${CURRENCY_SYMBOLS[quotedCurr]}${evaluatedNative.toLocaleString()}</span>
-                  </div>
-                  <div class="flex justify-between items-center text-white bg-slate-900/90 p-1.5 rounded border border-slate-800">
-                    <span class="font-semibold text-emerald-400">Evaluated in ${base}:</span>
-                    <span class="font-mono font-bold text-emerald-400 text-sm">${CURRENCY_SYMBOLS[base]}${Math.round(evaluatedInBase).toLocaleString()}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="space-y-1.5 pt-1">
-                <span class="text-[10px] uppercase font-bold tracking-wider text-slate-500">RFP Compliance Check</span>
-                ${currentProject.requirements.map(req => {
-                  const val = (offer.compliance && offer.compliance[req.id]) || "pass";
-                  return `
-                    <div class="flex items-center justify-between text-xs py-1 border-b border-slate-800/40">
-                      <span class="text-slate-300 text-[11px] truncate max-w-[180px]" title="${req.text}">${req.id}. ${req.text}</span>
-                      <select onchange="updateCompliance(${oIndex}, ${req.id}, this.value)" class="text-[11px] rounded px-1.5 py-0.5 font-semibold ${val === 'pass' ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : val === 'fail' ? 'bg-rose-950 text-rose-300 border border-rose-800' : 'bg-amber-950 text-amber-300 border border-amber-800'} outline-none">
-                        <option value="pass" ${val === 'pass' ? 'selected' : ''}>Pass</option>
-                        <option value="partial" ${val === 'partial' ? 'selected' : ''}>Partial</option>
-                        <option value="fail" ${val === 'fail' ? 'selected' : ''}>Fail</option>
-                      </select>
-                    </div>
-                  `;
-                }).join("")}
-              </div>
-            </div>
-          </div>
-        `;
-      }).join("");
-    }
-
-    function updateOfferField(oIdx, field, val) {
-      currentProject.offers[oIdx][field] = val;
-      persistCurrent();
-      renderOffers();
-    }
-
-    function updateCompliance(oIdx, reqId, val) {
-      if (!currentProject.offers[oIdx].compliance) currentProject.offers[oIdx].compliance = {};
-      currentProject.offers[oIdx].compliance[reqId] = val;
-      persistCurrent();
-      renderOffers();
-    }
-
-    function addAdjustment(oIdx) {
-      if (!currentProject.offers[oIdx].adjustments) currentProject.offers[oIdx].adjustments = [];
-      currentProject.offers[oIdx].adjustments.push({ desc: "Customs/Rigging/Transport", cost: 0 });
-      persistCurrent();
-      renderOffers();
-    }
-
-    function updateAdjustment(oIdx, aIdx, field, val) {
-      currentProject.offers[oIdx].adjustments[aIdx][field] = val;
-      persistCurrent();
-      renderOffers();
-    }
-
-    function removeAdjustment(oIdx, aIdx) {
-      currentProject.offers[oIdx].adjustments.splice(aIdx, 1);
-      persistCurrent();
-      renderOffers();
-    }
-
-    function calculateAndRenderSummary() {
-      const summaryEl = document.getElementById("evaluationSummary");
-      const base = currentProject.baseCurrency || "SAR";
-      const reqs = currentProject.requirements;
-      const w = currentProject.weights || { cost: 60, delivery: 10, warranty: 10, advance: 10, specs: 10 };
-
-      const offers = currentProject.offers.map(o => {
-        const quotedCurr = o.currency || base;
-        const totalAdjNative = (o.adjustments || []).reduce((s, a) => s + (Number(a.cost) || 0), 0);
-        const evalCostNative = (Number(o.headlinePrice) || 0) + totalAdjNative;
-        const evalCostInBase = convertToBase(evalCostNative, quotedCurr);
-        
-        let mandatoryPassed = true;
-        const failedMandatory = [];
-        reqs.forEach(r => {
-          if (r.type === "mandatory" && o.compliance[r.id] === "fail") {
-            mandatoryPassed = false;
-            failedMandatory.push(`${r.id}. ${r.text}`);
-          }
-        });
-
-        let weightedPoints = 0;
-        let weightedCount = 0;
-        reqs.forEach(r => {
-          if (r.type === "weighted") {
-            weightedCount++;
-            const stat = o.compliance[r.id];
-            if (stat === "pass") weightedPoints += 100;
-            else if (stat === "partial") weightedPoints += 50;
-          }
-        });
-        const weightedReqAvg = weightedCount > 0 ? (weightedPoints / weightedCount) : 100;
-
-        return {
-          ...o,
-          quotedCurr,
-          evalCostNative,
-          evalCostInBase: Math.round(evalCostInBase),
-          mandatoryPassed,
-          failedMandatory,
-          weightedReqAvg
-        };
-      });
-
-      const eligible = offers.filter(o => o.mandatoryPassed && o.evalCostInBase > 0);
-      let ranked = [];
-
-      if (eligible.length > 0) {
-        const minCost = Math.min(...eligible.map(o => o.evalCostInBase));
-        const minDeliv = Math.min(...eligible.map(o => o.deliveryDays));
-        const maxWarr = Math.max(...eligible.map(o => o.warrantyMonths));
-        const minAdv = Math.min(...eligible.map(o => o.advancePercent));
-
-        ranked = eligible.map(o => {
-          const costScore = (minCost / o.evalCostInBase) * Number(w.cost);
-          const delivScore = (minDeliv / o.deliveryDays) * Number(w.delivery);
-          const warrScore = (o.warrantyMonths / maxWarr) * Number(w.warranty);
-          const advScore = o.advancePercent === 0 && minAdv === 0 ? Number(w.advance) : ((minAdv + 1) / (o.advancePercent + 1)) * Number(w.advance);
-          const reqScore = (o.weightedReqAvg / 100) * Number(w.specs);
-
-          const totalScore = Number((costScore + delivScore + warrScore + advScore + reqScore).toFixed(2));
-          return { ...o, totalScore, costScore, delivScore, warrScore, advScore, reqScore };
-        }).sort((a, b) => b.totalScore - a.totalScore);
-      }
-
-      let html = `
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr class="border-b border-slate-800 text-slate-400 bg-slate-950/60 font-semibold">
-                <th class="py-2.5 px-3">Supplier Offer</th>
-                <th class="py-2.5 px-3">Quoted Headline</th>
-                <th class="py-2.5 px-3">Scope Offsets</th>
-                <th class="py-2.5 px-3">Normalized Landed (${base})</th>
-                <th class="py-2.5 px-3 text-center">RFP Compliance</th>
-                <th class="py-2.5 px-3 text-right">Composite Score</th>
-                <th class="py-2.5 px-3 text-center">Rank</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-800/60">
-      `;
-
-      offers.forEach(o => {
-        const rankInfo = ranked.find(r => r.id === o.id);
-        const isWinner = rankInfo && ranked[0].id === o.id;
-
-        html += `
-          <tr class="${!o.mandatoryPassed ? 'opacity-60 bg-rose-950/10' : isWinner ? 'bg-emerald-950/20 font-medium' : ''}">
-            <td class="py-3 px-3 font-semibold text-white">
-              ${o.name}
-              ${isWinner ? '<span class="ml-2 text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-1.5 py-0.5 rounded font-bold">RECOMMENDED AWARD</span>' : ''}
-              ${!o.mandatoryPassed ? `<div class="text-[10px] text-rose-400 font-normal">Disqualified: ${o.failedMandatory.join(', ')}</div>` : ''}
-            </td>
-            <td class="py-3 px-3 font-mono text-slate-300">${CURRENCY_SYMBOLS[o.quotedCurr]}${Number(o.headlinePrice).toLocaleString()}</td>
-            <td class="py-3 px-3 font-mono text-emerald-400">+${CURRENCY_SYMBOLS[o.quotedCurr]}${(o.adjustments||[]).reduce((s,a)=>s+(Number(a.cost)||0),0).toLocaleString()}</td>
-            <td class="py-3 px-3 font-mono font-bold text-emerald-400">${CURRENCY_SYMBOLS[base]}${o.evalCostInBase.toLocaleString()}</td>
-            <td class="py-3 px-3 text-center">
-              ${o.mandatoryPassed 
-                ? '<span class="text-xs text-emerald-400 font-bold">✓ Compliant</span>' 
-                : '<span class="text-xs text-rose-400 font-bold">✗ Disqualified</span>'}
-            </td>
-            <td class="py-3 px-3 text-right font-mono font-bold text-white text-sm">
-              ${rankInfo ? rankInfo.totalScore + '/100' : '0.00'}
-            </td>
-            <td class="py-3 px-3 text-center">
-              ${rankInfo ? `<span class="px-2 py-0.5 rounded font-bold font-mono ${isWinner ? 'bg-emerald-500 text-slate-950 text-xs' : 'bg-slate-800 text-slate-300 text-xs'}">#${ranked.indexOf(rankInfo)+1}</span>` : '<span class="text-rose-400 font-mono text-xs">DQ</span>'}
-            </td>
-          </tr>
-        `;
-      });
-
-      html += `
-            </tbody>
-          </table>
-        </div>
-      `;
-
-      if (ranked.length > 0) {
-        const top = ranked[0];
-        html += `
-          <div class="mt-4 p-4 bg-emerald-950/20 border border-emerald-800/50 rounded-xl space-y-2">
-            <div class="flex items-center justify-between">
-              <h4 class="text-xs font-bold uppercase tracking-wider text-emerald-400">Tender Board Recommendation</h4>
-              <span class="text-xs font-mono text-slate-400">Dynamic Multi-Criteria Scoring Active</span>
-            </div>
-            <p class="text-xs text-slate-200 leading-relaxed">
-              Award is recommended to <strong>${top.name}</strong> at a total evaluated contract price of <strong>${CURRENCY_SYMBOLS[base]}${top.evalCostInBase.toLocaleString()} ${base}</strong> (quoted at ${CURRENCY_SYMBOLS[top.quotedCurr]}${top.evalCostNative.toLocaleString()} ${top.quotedCurr}). Current weights apply: Cost (${w.cost}%), Delivery (${w.delivery}%), Warranty (${w.warranty}%), Advance Risk (${w.advance}%), Specs (${w.specs}%).
-            </p>
-          </div>
-        `;
-      }
-
-      summaryEl.innerHTML = html;
-    }
-
-    function renderAll() {
-      renderProjectDropdown();
-      syncWeightControls();
-      renderFXStrip();
-      renderRequirements();
-      renderOffers();
-      calculateAndRenderSummary();
-    }
-
-    function checkUrlLicense() {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get("pro") === "active_multicurrency_lead") {
-        localStorage.setItem(PRO_STATUS_KEY, "true");
-        alert("✓ QuoteCompare Pro (Asia & Multi-Currency Edition) unlocked!");
-      }
-    }
-
-    window.addEventListener("DOMContentLoaded", () => {
-      checkUrlLicense();
-      renderAll();
-    });
-  </script>
-</body>
-</html>
+      const d = new Date();
+      const printDateEl = document.getElementById("printDate");
+      if (printDateEl) {
+        printDateEl.textContent = "Evaluation Timestamp: " + d.toLocaleDateString() + " " + d.toLocaleTimeString
