@@ -29,8 +29,7 @@
 
       <div class="flex items-center gap-2">
         <label class="text-xs text-slate-400 font-medium">Project:</label>
-        <select id="projectSelect" onchange="switchProject(this.value)" class="bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:ring-1 focus:ring-emerald-500 outline-none">
-          </select>
+        <select id="projectSelect" onchange="switchProject(this.value)" class="bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:ring-1 focus:ring-emerald-500 outline-none"></select>
         <button onclick="createNewProject()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs rounded-lg border border-slate-700 transition">+ New</button>
         <button onclick="duplicateCurrentProject()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs rounded-lg border border-slate-700 transition">Duplicate</button>
         <button onclick="deleteCurrentProject()" class="px-2 py-1.5 bg-rose-950/60 hover:bg-rose-900 text-rose-300 text-xs rounded-lg border border-rose-800 transition">Delete</button>
@@ -40,7 +39,6 @@
   </header>
 
   <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
-
     <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4 space-y-4">
       <div class="flex flex-wrap items-center justify-between gap-4">
         <div class="space-y-1">
@@ -68,8 +66,7 @@
           <span class="font-bold text-slate-300">Baseline FX Rates</span>
           <span class="text-[11px] text-slate-500">(1 Foreign Unit = X Base Units)</span>
         </div>
-        <div id="fxRatesContainer" class="flex flex-wrap items-center gap-4">
-          </div>
+        <div id="fxRatesContainer" class="flex flex-wrap items-center gap-4"></div>
       </div>
     </div>
 
@@ -83,9 +80,7 @@
           Weight Distribution: <span class="font-mono text-emerald-400">Cost 60% · Lead Time 10% · Warranty 10% · Advance Risk 10% · Specs 10%</span>
         </div>
       </div>
-
-      <div id="requirementsContainer" class="grid grid-cols-1 md:grid-cols-5 gap-3">
-        </div>
+      <div id="requirementsContainer" class="grid grid-cols-1 md:grid-cols-5 gap-3"></div>
     </section>
 
     <section class="space-y-4">
@@ -93,9 +88,7 @@
         <h2 class="text-sm font-semibold text-white">2. Multi-Currency Supplier Offers & Scope Leveling</h2>
         <span class="text-xs text-slate-400">Set each vendor's quoted currency independently. Adjustments convert automatically.</span>
       </div>
-
-      <div id="offersContainer" class="grid grid-cols-1 md:grid-cols-3 gap-5">
-        </div>
+      <div id="offersContainer" class="grid grid-cols-1 md:grid-cols-3 gap-5"></div>
     </section>
 
     <section class="bg-slate-900/60 border border-slate-800 rounded-xl p-5 space-y-4">
@@ -105,11 +98,8 @@
           <p class="text-xs text-slate-400">All prices converted to the base currency to ensure an accurate, defensible award decision.</p>
         </div>
       </div>
-
-      <div id="evaluationSummary" class="space-y-4">
-        </div>
+      <div id="evaluationSummary" class="space-y-4"></div>
     </section>
-
   </main>
 
   <script>
@@ -122,12 +112,12 @@
 
     function triggerPaywall(featureName) {
       const proceed = confirm(
-        `🔒 QuoteCompare Pro Feature: ${featureName}\n\n` +
-        `Upgrade for $29/month to access:\n` +
-        `• Unlimited Multi-Currency Projects\n` +
-        `• Executive PDF Tender Board Memo Export\n` +
-        `• Landed Cost & FX Normalization Engines\n\n` +
-        `Click OK to proceed to secure checkout.`
+        "🔒 QuoteCompare Pro Feature: " + featureName + "\n\n" +
+        "Upgrade for $29/month to access:\n" +
+        "• Unlimited Multi-Currency Projects\n" +
+        "• Executive PDF Tender Board Memo Export\n" +
+        "• Landed Cost & FX Normalization Engines\n\n" +
+        "Click OK to proceed to secure checkout."
       );
       if (proceed) {
         window.open(STRIPE_CHECKOUT_URL, "_blank");
@@ -203,8 +193,8 @@
       ]
     };
 
-    const STORAGE_KEY = "quotecompare_projects_fx_v5";
-    const ACTIVE_KEY = "quotecompare_active_id_fx_v5";
+    const STORAGE_KEY = "quotecompare_projects_fx_v6";
+    const ACTIVE_KEY = "quotecompare_active_id_fx_v6";
 
     function getStoredProjects() {
       try {
