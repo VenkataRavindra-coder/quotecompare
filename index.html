@@ -220,4 +220,529 @@
           </div>
         </div>
 
-        <div class="border border
+        <div class="border border-slate-300 p-3 rounded space-y-6 bg-slate-50">
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Final Approval for Award</span>
+            <p class="font-bold text-xs text-slate-900 mt-1">Director of Procurement / VP Supply Chain</p>
+            <p class="text-[10px] text-slate-500">Tender Board Authority</p>
+          </div>
+          <div class="space-y-2 pt-4 border-t border-dashed border-slate-300">
+            <div class="flex justify-between text-[10px] text-slate-600">
+              <span>Signature: _______________________</span>
+            </div>
+            <div class="flex justify-between text-[10px] text-slate-600">
+              <span>Date: _____ / _____ / 2026</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="border-t border-slate-800 bg-slate-900/60 py-4 px-4 text-center text-xs text-slate-500 no-print mt-12">
+    <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2">
+      <p>© 2026 QuoteCompare Systems. Designed for global EPC, infrastructure, and enterprise commercial evaluation.</p>
+      <p class="font-mono text-emerald-500/80">Local Storage Active • Fully Offline Capable</p>
+    </div>
+  </footer>
+
+  <script>
+    const CURRENCY_SYMBOLS = {
+      SAR: "SAR ",
+      AED: "AED ",
+      INR: "₹",
+      USD: "$",
+      EUR: "€",
+      GBP: "£",
+      SGD: "S$",
+      CNY: "¥",
+      JPY: "¥"
+    };
+
+    const DEFAULT_RATES_TO_USD = {
+      USD: 1.0,
+      AED: 0.2723,
+      SAR: 0.2660,
+      INR: 0.0105,
+      EUR: 1.0800,
+      GBP: 1.2700,
+      SGD: 0.7600,
+      CNY: 0.1380,
+      JPY: 0.0068
+    };
+
+    const ALL_CURRENCIES = ["SAR", "AED", "INR", "USD", "EUR", "GBP", "SGD", "CNY", "JPY"];
+
+    function getFreshTemplate() {
+      return {
+        id: "proj_default_tender",
+        title: "Regional Plant Package — Cross-Border Supply Normalization",
+        baseCurrency: "SAR",
+        fxRates: { ...DEFAULT_RATES_TO_USD },
+        weights: { cost: 60, delivery: 10, warranty: 10, advance: 10, specs: 10 },
+        requirements: [
+          { id: 1, text: "24-Month Comprehensive Warranty", type: "mandatory" },
+          { id: 2, text: "DDP Delivery & Rigging to Foundation", type: "mandatory" },
+          { id: 3, text: "On-site Testing & Commissioning Scope", type: "mandatory" },
+          { id: 4, text: "Delivery Lead Time Under 60 Days", type: "weighted" },
+          { id: 5, text: "Advance Payment Under 20%", type: "weighted" }
+        ],
+        offers: [
+          {
+            id: 1,
+            name: "Vendor Alpha (India EPC)",
+            currency: "INR",
+            headlinePrice: 8200000,
+            deliveryDays: 45,
+            warrantyMonths: 24,
+            advancePercent: 15,
+            incoterm: "CIF Jebel Ali",
+            adjustments: [
+              { desc: "Local port customs clearance & handling", cost: 120000 },
+              { desc: "Heavy road haulage to site", cost: 180000 }
+            ],
+            compliance: { 1: "pass", 2: "pass", 3: "pass", 4: "pass", 5: "pass" }
+          },
+          {
+            id: 2,
+            name: "Vendor Beta (KSA / Regional)",
+            currency: "SAR",
+            headlinePrice: 380000,
+            deliveryDays: 21,
+            warrantyMonths: 24,
+            advancePercent: 20,
+            incoterm: "DDP Jobsite",
+            adjustments: [],
+            compliance: { 1: "pass", 2: "pass", 3: "pass", 4: "pass", 5: "pass" }
+          },
+          {
+            id: 3,
+            name: "Vendor Gamma (China Direct)",
+            currency: "CNY",
+            headlinePrice: 650000,
+            deliveryDays: 70,
+            warrantyMonths: 12,
+            advancePercent: 30,
+            incoterm: "FOB Shanghai",
+            adjustments: [
+              { desc: "Sea Freight & Marine Insurance", cost: 45000 },
+              { desc: "Local Crane & Rigging Execution", cost: 25000 }
+            ],
+            compliance: { 1: "fail", 2: "fail", 3: "pass", 4: "partial", 5: "fail" }
+          }
+        ]
+      };
+    }
+
+    const STORAGE_KEY = "qc_active_projects_stable";
+    const ACTIVE_KEY = "qc_active_id_stable";
+
+    function loadProjects() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return [getFreshTemplate()];
+        const list = JSON.parse(raw);
+        if (Array.isArray(list) && list.length > 0 && list[0].offers && list[0].offers.length > 0) {
+          return list;
+        }
+        return [getFreshTemplate()];
+      } catch (e) {
+        return [getFreshTemplate()];
+      }
+    }
+
+    let projects = loadProjects();
+    let currentProject = projects.find(p => p.id === localStorage.getItem(ACTIVE_KEY)) || projects[0];
+
+    function persist() {
+      const idx = projects.findIndex(p => p.id === currentProject.id);
+      if (idx >= 0) projects[idx] = currentProject;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
+      localStorage.setItem(ACTIVE_KEY, currentProject.id);
+      
+      const el = document.getElementById("autoSaveIndicator");
+      if (el) {
+        el.textContent = "Saving...";
+        el.className = "text-amber-400 font-mono";
+        setTimeout(() => {
+          el.textContent = "Synced locally";
+          el.className = "text-emerald-400 font-mono";
+        }, 300);
+      }
+      calculateAndRenderSummary();
+    }
+
+    function convertToBase(amount, fromCurrency) {
+      if (!amount || isNaN(amount)) return 0;
+      const base = currentProject.baseCurrency || "SAR";
+      if (fromCurrency === base) return Number(amount);
+
+      const rates = currentProject.fxRates || DEFAULT_RATES_TO_USD;
+      const rateToUSD = rates[fromCurrency] !== undefined ? rates[fromCurrency] : (DEFAULT_RATES_TO_USD[fromCurrency] || 1.0);
+      const baseRateToUSD = rates[base] !== undefined ? rates[base] : (DEFAULT_RATES_TO_USD[base] || 1.0);
+
+      const inUSD = Number(amount) * rateToUSD;
+      return inUSD / baseRateToUSD;
+    }
+
+    function getDirectRateToBase(foreignCurr) {
+      const base = currentProject.baseCurrency || "SAR";
+      const rates = currentProject.fxRates || DEFAULT_RATES_TO_USD;
+      const foreignToUSD = rates[foreignCurr] !== undefined ? rates[foreignCurr] : (DEFAULT_RATES_TO_USD[foreignCurr] || 1.0);
+      const baseToUSD = rates[base] !== undefined ? rates[base] : (DEFAULT_RATES_TO_USD[base] || 1.0);
+      return foreignToUSD / baseToUSD;
+    }
+
+    function renderFXStrip() {
+      const c = document.getElementById("fxRatesContainer");
+      if (!c) return;
+      const base = currentProject.baseCurrency || "SAR";
+      const currencies = ALL_CURRENCIES.filter(curr => curr !== base);
+
+      c.innerHTML = currencies.map(curr => {
+        const directRate = getDirectRateToBase(curr);
+        const displayVal = directRate >= 1 ? directRate.toFixed(4) : directRate.toFixed(5);
+        return `
+          <div class="flex items-center gap-1.5 font-mono bg-slate-900 px-2 py-1 rounded border border-slate-800">
+            <span class="text-slate-400">1 ${curr} =</span>
+            <input type="number" step="0.0001" value="${displayVal}" data-fx="${curr}" class="fx-input w-20 bg-slate-950 border border-slate-700 rounded px-1.5 py-0.5 text-right text-emerald-400 font-bold outline-none" />
+            <span class="text-slate-500 text-[10px]">${base}</span>
+          </div>
+        `;
+      }).join("");
+
+      document.querySelectorAll(".fx-input").forEach(input => {
+        input.addEventListener("change", (e) => {
+          const curr = e.target.getAttribute("data-fx");
+          const val = Number(e.target.value);
+          const baseToUSD = currentProject.fxRates[base] !== undefined ? currentProject.fxRates[base] : DEFAULT_RATES_TO_USD[base];
+          currentProject.fxRates[curr] = val * baseToUSD;
+          persist();
+          renderOffers();
+        });
+      });
+    }
+
+    function renderRequirements() {
+      const c = document.getElementById("requirementsContainer");
+      if (!c) return;
+      c.innerHTML = currentProject.requirements.map(req => `
+        <div class="bg-slate-900 border border-slate-800 rounded-lg p-3 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono font-bold text-slate-500">Slot ${req.id}</span>
+            <select data-reqid="${req.id}" class="req-type-sel text-[11px] font-semibold rounded px-1.5 py-0.5 ${req.type === 'mandatory' ? 'bg-rose-950 text-rose-300 border border-rose-800' : 'bg-emerald-950 text-emerald-300 border border-emerald-800'} outline-none">
+              <option value="mandatory" ${req.type === 'mandatory' ? 'selected' : ''}>Mandatory</option>
+              <option value="weighted" ${req.type === 'weighted' ? 'selected' : ''}>Weighted</option>
+            </select>
+          </div>
+          <input type="text" value="${req.text}" data-reqid="${req.id}" class="req-text-input w-full bg-slate-950 border border-slate-800 rounded px-2 py-1 text-xs text-white focus:border-emerald-500 outline-none" />
+        </div>
+      `).join("");
+
+      document.querySelectorAll(".req-type-sel").forEach(sel => {
+        sel.addEventListener("change", (e) => {
+          const id = Number(e.target.getAttribute("data-reqid"));
+          const r = currentProject.requirements.find(x => x.id === id);
+          if (r) { r.type = e.target.value; persist(); renderRequirements(); }
+        });
+      });
+
+      document.querySelectorAll(".req-text-input").forEach(input => {
+        input.addEventListener("change", (e) => {
+          const id = Number(e.target.getAttribute("data-reqid"));
+          const r = currentProject.requirements.find(x => x.id === id);
+          if (r) { r.text = e.target.value; persist(); }
+        });
+      });
+    }
+
+    function renderOffers() {
+      const c = document.getElementById("offersContainer");
+      if (!c) return;
+      const base = currentProject.baseCurrency || "SAR";
+
+      c.innerHTML = currentProject.offers.map((offer, oIndex) => {
+        const quotedCurr = offer.currency || base;
+        const totalAdjustmentsNative = (offer.adjustments || []).reduce((sum, a) => sum + (Number(a.cost) || 0), 0);
+        const evaluatedNative = (Number(offer.headlinePrice) || 0) + totalAdjustmentsNative;
+        const evaluatedInBase = convertToBase(evaluatedNative, quotedCurr);
+
+        return `
+          <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-4 space-y-4 flex flex-col justify-between offer-card">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                <input type="text" value="${offer.name}" onchange="updateOfferField(${oIndex}, 'name', this.value)" class="font-bold text-xs text-white bg-transparent border-b border-transparent hover:border-slate-700 focus:border-emerald-500 outline-none w-full" />
+              </div>
+
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <label class="text-[10px] text-slate-400 block">Currency</label>
+                  <select onchange="updateOfferField(${oIndex}, 'currency', this.value)" class="w-full bg-slate-950 border border-slate-800 rounded px-1.5 py-1 text-xs text-emerald-400 font-bold font-mono outline-none">
+                    ${ALL_CURRENCIES.map(curr => `<option value="${curr}" ${quotedCurr === curr ? 'selected' : ''}>${curr} (${CURRENCY_SYMBOLS[curr].trim()})</option>`).join("")}
+                  </select>
+                </div>
+                <div>
+                  <label class="text-[10px] text-slate-400 block">Headline Total</label>
+                  <input type="number" value="${offer.headlinePrice}" onchange="updateOfferField(${oIndex}, 'headlinePrice', Number(this.value))" class="w-full bg-slate-950 border border-slate-800 rounded px-2 py-1 text-xs text-white font-mono font-bold outline-none" />
+                </div>
+                <div>
+                  <label class="text-[10px] text-slate-400 block">Incoterm</label>
+                  <input type="text" value="${offer.incoterm || 'DDP'}" onchange="updateOfferField(${oIndex}, 'incoterm', this.value)" class="w-full bg-slate-950 border border-slate-800 rounded px-2 py-1 text-xs text-white font-mono outline-none" />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-3 gap-2 text-center">
+                <div class="bg-slate-950 p-1.5 rounded border border-slate-800">
+                  <span class="text-[10px] text-slate-400 block">Delivery (d)</span>
+                  <input type="number" value="${offer.deliveryDays}" onchange="updateOfferField(${oIndex}, 'deliveryDays', Number(this.value))" class="w-full text-center bg-transparent text-xs text-white font-mono outline-none" />
+                </div>
+                <div class="bg-slate-950 p-1.5 rounded border border-slate-800">
+                  <span class="text-[10px] text-slate-400 block">Warranty (mo)</span>
+                  <input type="number" value="${offer.warrantyMonths}" onchange="updateOfferField(${oIndex}, 'warrantyMonths', Number(this.value))" class="w-full text-center bg-transparent text-xs text-white font-mono outline-none" />
+                </div>
+                <div class="bg-slate-950 p-1.5 rounded border border-slate-800">
+                  <span class="text-[10px] text-slate-400 block">Advance (%)</span>
+                  <input type="number" value="${offer.advancePercent}" onchange="updateOfferField(${oIndex}, 'advancePercent', Number(this.value))" class="w-full text-center bg-transparent text-xs text-white font-mono outline-none" />
+                </div>
+              </div>
+
+              <div class="bg-slate-950/80 border border-slate-800/80 rounded-lg p-3 space-y-2">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="font-semibold text-slate-300">Landed Cost Scope Leveling</span>
+                  <span class="font-mono text-emerald-400 font-bold">+${CURRENCY_SYMBOLS[quotedCurr]}${totalAdjustmentsNative.toLocaleString()}</span>
+                </div>
+                
+                <div class="space-y-1.5">
+                  ${(offer.adjustments || []).map((adj, aIdx) => `
+                    <div class="flex items-center gap-1.5 text-[11px]">
+                      <input type="text" value="${adj.desc}" onchange="updateAdjustment(${oIndex}, ${aIdx}, 'desc', this.value)" class="flex-1 bg-slate-900 border border-slate-800 rounded px-1.5 py-0.5 text-slate-200 outline-none" />
+                      <input type="number" value="${adj.cost}" onchange="updateAdjustment(${oIndex}, ${aIdx}, 'cost', Number(this.value))" class="w-20 bg-slate-900 border border-slate-800 rounded px-1.5 py-0.5 text-right font-mono text-white outline-none" />
+                      <button onclick="removeAdjustment(${oIndex}, ${aIdx})" class="text-rose-500 hover:text-rose-400 px-1 font-bold no-print">×</button>
+                    </div>
+                  `).join("")}
+                </div>
+
+                <button onclick="addAdjustment(${oIndex})" class="w-full text-left text-[11px] text-emerald-400 hover:text-emerald-300 font-medium pt-1 no-print">+ Add Scope Offset (${quotedCurr})</button>
+
+                <div class="border-t border-slate-800 pt-2 flex flex-col gap-1 text-xs">
+                  <div class="flex justify-between items-center text-slate-400">
+                    <span>Quoted Landed Total:</span>
+                    <span class="font-mono font-bold text-slate-300">${CURRENCY_SYMBOLS[quotedCurr]}${evaluatedNative.toLocaleString()}</span>
+                  </div>
+                  <div class="flex justify-between items-center text-white bg-slate-900/90 p-1.5 rounded border border-slate-800">
+                    <span class="font-semibold text-emerald-400">Evaluated in ${base}:</span>
+                    <span class="font-mono font-bold text-emerald-400 text-sm">${CURRENCY_SYMBOLS[base]}${Math.round(evaluatedInBase).toLocaleString()}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="space-y-1.5 pt-1">
+                <span class="text-[10px] uppercase font-bold tracking-wider text-slate-500">RFP Compliance Check</span>
+                ${currentProject.requirements.map(req => {
+                  const val = (offer.compliance && offer.compliance[req.id]) || "pass";
+                  return `
+                    <div class="flex items-center justify-between text-xs py-1 border-b border-slate-800/40">
+                      <span class="text-slate-300 text-[11px] truncate max-w-[180px]" title="${req.text}">${req.id}. ${req.text}</span>
+                      <select onchange="updateCompliance(${oIndex}, ${req.id}, this.value)" class="text-[11px] rounded px-1.5 py-0.5 font-semibold ${val === 'pass' ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : val === 'fail' ? 'bg-rose-950 text-rose-300 border border-rose-800' : 'bg-amber-950 text-amber-300 border border-amber-800'} outline-none">
+                        <option value="pass" ${val === 'pass' ? 'selected' : ''}>Pass</option>
+                        <option value="partial" ${val === 'partial' ? 'selected' : ''}>Partial</option>
+                        <option value="fail" ${val === 'fail' ? 'selected' : ''}>Fail</option>
+                      </select>
+                    </div>
+                  `;
+                }).join("")}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    window.updateOfferField = function(oIdx, field, val) {
+      currentProject.offers[oIdx][field] = val;
+      persist();
+      renderOffers();
+    };
+
+    window.updateCompliance = function(oIdx, reqId, val) {
+      if (!currentProject.offers[oIdx].compliance) currentProject.offers[oIdx].compliance = {};
+      currentProject.offers[oIdx].compliance[reqId] = val;
+      persist();
+      renderOffers();
+    };
+
+    window.addAdjustment = function(oIdx) {
+      if (!currentProject.offers[oIdx].adjustments) currentProject.offers[oIdx].adjustments = [];
+      currentProject.offers[oIdx].adjustments.push({ desc: "Customs/Rigging/Transport", cost: 0 });
+      persist();
+      renderOffers();
+    };
+
+    window.updateAdjustment = function(oIdx, aIdx, field, val) {
+      currentProject.offers[oIdx].adjustments[aIdx][field] = val;
+      persist();
+      renderOffers();
+    };
+
+    window.removeAdjustment = function(oIdx, aIdx) {
+      currentProject.offers[oIdx].adjustments.splice(aIdx, 1);
+      persist();
+      renderOffers();
+    };
+
+    function calculateAndRenderSummary() {
+      const summaryEl = document.getElementById("evaluationSummary");
+      if (!summaryEl) return;
+      const base = currentProject.baseCurrency || "SAR";
+      const reqs = currentProject.requirements;
+      const w = currentProject.weights || { cost: 60, delivery: 10, warranty: 10, advance: 10, specs: 10 };
+
+      const offers = currentProject.offers.map(o => {
+        const quotedCurr = o.currency || base;
+        const totalAdjNative = (o.adjustments || []).reduce((s, a) => s + (Number(a.cost) || 0), 0);
+        const evalCostNative = (Number(o.headlinePrice) || 0) + totalAdjNative;
+        const evalCostInBase = convertToBase(evalCostNative, quotedCurr);
+        
+        let mandatoryPassed = true;
+        const failedMandatory = [];
+        reqs.forEach(r => {
+          if (r.type === "mandatory" && o.compliance[r.id] === "fail") {
+            mandatoryPassed = false;
+            failedMandatory.push(`${r.id}. ${r.text}`);
+          }
+        });
+
+        let weightedPoints = 0;
+        let weightedCount = 0;
+        reqs.forEach(r => {
+          if (r.type === "weighted") {
+            weightedCount++;
+            const stat = o.compliance[r.id];
+            if (stat === "pass") weightedPoints += 100;
+            else if (stat === "partial") weightedPoints += 50;
+          }
+        });
+        const weightedReqAvg = weightedCount > 0 ? (weightedPoints / weightedCount) : 100;
+
+        return {
+          ...o,
+          quotedCurr,
+          evalCostNative,
+          evalCostInBase: Math.round(evalCostInBase),
+          mandatoryPassed,
+          failedMandatory,
+          weightedReqAvg
+        };
+      });
+
+      const eligible = offers.filter(o => o.mandatoryPassed && o.evalCostInBase > 0);
+      let ranked = [];
+
+      if (eligible.length > 0) {
+        const minCost = Math.min(...eligible.map(o => o.evalCostInBase));
+        const minDeliv = Math.min(...eligible.map(o => o.deliveryDays));
+        const maxWarr = Math.max(...eligible.map(o => o.warrantyMonths));
+        const minAdv = Math.min(...eligible.map(o => o.advancePercent));
+
+        ranked = eligible.map(o => {
+          const costScore = (minCost / o.evalCostInBase) * Number(w.cost);
+          const delivScore = (minDeliv / o.deliveryDays) * Number(w.delivery);
+          const warrScore = (o.warrantyMonths / maxWarr) * Number(w.warranty);
+          const advScore = o.advancePercent === 0 && minAdv === 0 ? Number(w.advance) : ((minAdv + 1) / (o.advancePercent + 1)) * Number(w.advance);
+          const reqScore = (o.weightedReqAvg / 100) * Number(w.specs);
+
+          const totalScore = Number((costScore + delivScore + warrScore + advScore + reqScore).toFixed(2));
+          return { ...o, totalScore, costScore, delivScore, warrScore, advScore, reqScore };
+        }).sort((a, b) => b.totalScore - a.totalScore);
+      }
+
+      let html = `
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="border-b border-slate-800 text-slate-400 bg-slate-950/60 font-semibold">
+                <th class="py-2.5 px-3">Supplier Offer</th>
+                <th class="py-2.5 px-3">Quoted Headline</th>
+                <th class="py-2.5 px-3">Scope Offsets</th>
+                <th class="py-2.5 px-3">Normalized Landed (${base})</th>
+                <th class="py-2.5 px-3 text-center">RFP Compliance</th>
+                <th class="py-2.5 px-3 text-right">Composite Score</th>
+                <th class="py-2.5 px-3 text-center">Rank</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800/60">
+      `;
+
+      offers.forEach(o => {
+        const rankInfo = ranked.find(r => r.id === o.id);
+        const isWinner = rankInfo && ranked[0].id === o.id;
+
+        html += `
+          <tr class="${!o.mandatoryPassed ? 'opacity-60 bg-rose-950/10' : isWinner ? 'bg-emerald-950/20 font-medium' : ''}">
+            <td class="py-3 px-3 font-semibold text-white">
+              ${o.name}
+              ${isWinner ? '<span class="ml-2 text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-1.5 py-0.5 rounded font-bold">RECOMMENDED AWARD</span>' : ''}
+              ${!o.mandatoryPassed ? `<div class="text-[10px] text-rose-400 font-normal">Disqualified: ${o.failedMandatory.join(', ')}</div>` : ''}
+            </td>
+            <td class="py-3 px-3 font-mono text-slate-300">${CURRENCY_SYMBOLS[o.quotedCurr]}${Number(o.headlinePrice).toLocaleString()}</td>
+            <td class="py-3 px-3 font-mono text-emerald-400">+${CURRENCY_SYMBOLS[o.quotedCurr]}${(o.adjustments||[]).reduce((s,a)=>s+(Number(a.cost)||0),0).toLocaleString()}</td>
+            <td class="py-3 px-3 font-mono font-bold text-emerald-400">${CURRENCY_SYMBOLS[base]}${o.evalCostInBase.toLocaleString()}</td>
+            <td class="py-3 px-3 text-center">
+              ${o.mandatoryPassed 
+                ? '<span class="text-xs text-emerald-400 font-bold">✓ Compliant</span>' 
+                : '<span class="text-xs text-rose-400 font-bold">✗ Disqualified</span>'}
+            </td>
+            <td class="py-3 px-3 text-right font-mono font-bold text-white text-sm">
+              ${rankInfo ? rankInfo.totalScore + '/100' : '0.00'}
+            </td>
+            <td class="py-3 px-3 text-center">
+              ${rankInfo ? `<span class="px-2 py-0.5 rounded font-bold font-mono ${isWinner ? 'bg-emerald-500 text-slate-950 text-xs' : 'bg-slate-800 text-slate-300 text-xs'}">#${ranked.indexOf(rankInfo)+1}</span>` : '<span class="text-rose-400 font-mono text-xs">DQ</span>'}
+            </td>
+          </tr>
+        `;
+      });
+
+      html += `
+            </tbody>
+          </table>
+        </div>
+      `;
+
+      if (ranked.length > 0) {
+        const top = ranked[0];
+        html += `
+          <div class="mt-4 p-4 bg-emerald-950/20 border border-emerald-800/50 rounded-xl space-y-2 audit-box">
+            <div class="flex items-center justify-between">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-emerald-400">Formal Sourcing Award Determination</h4>
+              <span class="text-xs font-mono text-slate-400">Board Resolution Paper</span>
+            </div>
+            <p class="text-xs text-slate-200 leading-relaxed">
+              Based on the multi-criteria evaluation model, contract award is recommended to <strong>${top.name}</strong> at a total evaluated landed price of <strong>${CURRENCY_SYMBOLS[base]}${top.evalCostInBase.toLocaleString()} ${base}</strong> (originally quoted at ${CURRENCY_SYMBOLS[top.quotedCurr]}${top.evalCostNative.toLocaleString()} ${top.quotedCurr}). Evaluation governance weights applied: Commercial Price (${w.cost}%), Delivery Turnaround (${w.delivery}%), Warranty Performance (${w.warranty}%), Advance Risk (${w.advance}%), Technical RFP Compliance (${w.specs}%).
+            </p>
+          </div>
+        `;
+      }
+
+      summaryEl.innerHTML = html;
+    }
+
+    function syncControls() {
+      const sel = document.getElementById("projectSelect");
+      if (sel) {
+        sel.innerHTML = projects.map(p => `<option value="${p.id}" ${p.id === currentProject.id ? "selected" : ""}>${p.title}</option>`).join("");
+      }
+      const title = document.getElementById("tenderTitle");
+      if (title) title.value = currentProject.title;
+      const baseSel = document.getElementById("baseCurrencySelect");
+      if (baseSel) baseSel.value = currentProject.baseCurrency || "SAR";
+
+      const w = currentProject.weights || { cost: 60, delivery: 10, warranty: 10, advance: 10, specs: 10 };
+      document.getElementById("sliderCost").value = w.cost;
+      document.getElementById("sliderDelivery").value = w.delivery;
+      document.getElementById("sliderWarranty").value = w.warranty;
+      document.getElementById("sliderAdvance").value = w.advance;
+      document.getElementById("sliderSpecs").value = w.specs;
+
+      document.getElementById("labelWeightCost").textContent = w.cost + "%";
+      document.getElementById("labelWeightDelivery").textContent = w.delivery + "%";
+      document.getElementById("labelWeightWarranty").textContent = w.warranty
