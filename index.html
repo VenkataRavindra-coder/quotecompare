@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>QuoteCompare — Enterprise Multi-Currency Sourcing Engine</title>
+  <title>QuoteCompare Enterprise — Multi-Currency Sourcing Decision Engine</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @media print {
@@ -49,11 +49,11 @@
 
       <div class="flex items-center gap-2">
         <label class="text-xs text-slate-400 font-medium">Tender:</label>
-        <select id="projectSelect" onchange="switchProject(this.value)" class="bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:ring-1 focus:ring-emerald-500 outline-none"></select>
-        <button onclick="createNewProject()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs rounded-lg border border-slate-700 transition">+ New</button>
-        <button onclick="duplicateCurrentProject()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs rounded-lg border border-slate-700 transition">Duplicate</button>
-        <button onclick="deleteCurrentProject()" class="px-2 py-1.5 bg-rose-950/60 hover:bg-rose-900 text-rose-300 text-xs rounded-lg border border-rose-800 transition">Delete</button>
-        <button onclick="handleExportPDF()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs rounded-lg shadow-md shadow-emerald-600/20 transition ml-2">Export Tender Memo (PDF)</button>
+        <select id="projectSelect" class="bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:ring-1 focus:ring-emerald-500 outline-none"></select>
+        <button id="btnNewProject" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs rounded-lg border border-slate-700 transition">+ New</button>
+        <button id="btnDupProject" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs rounded-lg border border-slate-700 transition">Duplicate</button>
+        <button id="btnDelProject" class="px-2 py-1.5 bg-rose-950/60 hover:bg-rose-900 text-rose-300 text-xs rounded-lg border border-rose-800 transition">Delete</button>
+        <button id="btnExportPDF" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs rounded-lg shadow-md shadow-emerald-600/20 transition ml-2">Export Tender Memo (PDF)</button>
       </div>
     </div>
   </header>
@@ -77,13 +77,13 @@
     <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4 space-y-4">
       <div class="flex flex-wrap items-center justify-between gap-4">
         <div class="space-y-1">
-          <input type="text" id="tenderTitle" onchange="updateProjectMeta('title', this.value)" class="bg-transparent text-lg font-bold text-white border-b border-transparent hover:border-slate-700 focus:border-emerald-500 focus:outline-none px-1 w-full md:w-[480px]" />
+          <input type="text" id="tenderTitle" class="bg-transparent text-lg font-bold text-white border-b border-transparent hover:border-slate-700 focus:border-emerald-500 focus:outline-none px-1 w-full md:w-[480px]" />
           <p class="text-xs text-slate-400">Foreign currency proposals automatically normalize into your commercial base currency using audit exchange rates.</p>
         </div>
         <div class="flex items-center gap-3 text-xs">
           <div class="bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700/60 flex items-center gap-2">
             <span class="text-slate-400">Evaluation Base:</span>
-            <select id="baseCurrencySelect" onchange="changeBaseCurrency(this.value)" class="bg-slate-900 border border-slate-700 text-emerald-400 font-bold rounded px-2 py-0.5 outline-none">
+            <select id="baseCurrencySelect" class="bg-slate-900 border border-slate-700 text-emerald-400 font-bold rounded px-2 py-0.5 outline-none">
               <option value="SAR">SAR (SAR)</option>
               <option value="AED">AED (AED)</option>
               <option value="INR">INR (₹)</option>
@@ -128,35 +128,35 @@
             <span class="text-slate-400 font-medium">Cost Weight</span>
             <span id="labelWeightCost" class="font-mono text-emerald-400 font-bold">60%</span>
           </div>
-          <input type="range" id="sliderCost" min="10" max="80" step="5" value="60" oninput="updateWeights()" class="w-full accent-emerald-500 cursor-pointer h-1.5 bg-slate-800 rounded-lg" />
+          <input type="range" id="sliderCost" min="10" max="80" step="5" value="60" class="w-full accent-emerald-500 cursor-pointer h-1.5 bg-slate-800 rounded-lg" />
         </div>
         <div>
           <div class="flex justify-between text-[11px] mb-1">
             <span class="text-slate-400 font-medium">Delivery Speed</span>
             <span id="labelWeightDelivery" class="font-mono text-emerald-400 font-bold">10%</span>
           </div>
-          <input type="range" id="sliderDelivery" min="0" max="40" step="5" value="10" oninput="updateWeights()" class="w-full accent-emerald-500 cursor-pointer h-1.5 bg-slate-800 rounded-lg" />
+          <input type="range" id="sliderDelivery" min="0" max="40" step="5" value="10" class="w-full accent-emerald-500 cursor-pointer h-1.5 bg-slate-800 rounded-lg" />
         </div>
         <div>
           <div class="flex justify-between text-[11px] mb-1">
             <span class="text-slate-400 font-medium">Warranty Length</span>
             <span id="labelWeightWarranty" class="font-mono text-emerald-400 font-bold">10%</span>
           </div>
-          <input type="range" id="sliderWarranty" min="0" max="40" step="5" value="10" oninput="updateWeights()" class="w-full accent-emerald-500 cursor-pointer h-1.5 bg-slate-800 rounded-lg" />
+          <input type="range" id="sliderWarranty" min="0" max="40" step="5" value="10" class="w-full accent-emerald-500 cursor-pointer h-1.5 bg-slate-800 rounded-lg" />
         </div>
         <div>
           <div class="flex justify-between text-[11px] mb-1">
             <span class="text-slate-400 font-medium">Advance Terms</span>
             <span id="labelWeightAdvance" class="font-mono text-emerald-400 font-bold">10%</span>
           </div>
-          <input type="range" id="sliderAdvance" min="0" max="40" step="5" value="10" oninput="updateWeights()" class="w-full accent-emerald-500 cursor-pointer h-1.5 bg-slate-800 rounded-lg" />
+          <input type="range" id="sliderAdvance" min="0" max="40" step="5" value="10" class="w-full accent-emerald-500 cursor-pointer h-1.5 bg-slate-800 rounded-lg" />
         </div>
         <div>
           <div class="flex justify-between text-[11px] mb-1">
             <span class="text-slate-400 font-medium">RFP Specs / Tech</span>
             <span id="labelWeightSpecs" class="font-mono text-emerald-400 font-bold">10%</span>
           </div>
-          <input type="range" id="sliderSpecs" min="0" max="40" step="5" value="10" oninput="updateWeights()" class="w-full accent-emerald-500 cursor-pointer h-1.5 bg-slate-800 rounded-lg" />
+          <input type="range" id="sliderSpecs" min="0" max="40" step="5" value="10" class="w-full accent-emerald-500 cursor-pointer h-1.5 bg-slate-800 rounded-lg" />
         </div>
       </div>
 
@@ -220,58 +220,4 @@
           </div>
         </div>
 
-        <div class="border border-slate-300 p-3 rounded space-y-6 bg-slate-50">
-          <div>
-            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Final Approval for Award</span>
-            <p class="font-bold text-xs text-slate-900 mt-1">Director of Procurement / VP Supply Chain</p>
-            <p class="text-[10px] text-slate-500">Tender Board Authority</p>
-          </div>
-          <div class="space-y-2 pt-4 border-t border-dashed border-slate-300">
-            <div class="flex justify-between text-[10px] text-slate-600">
-              <span>Signature: _______________________</span>
-            </div>
-            <div class="flex justify-between text-[10px] text-slate-600">
-              <span>Date: _____ / _____ / 2026</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="border-t border-slate-800 bg-slate-900/60 py-4 px-4 text-center text-xs text-slate-500 no-print mt-12">
-    <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2">
-      <p>© 2026 QuoteCompare Systems. Designed for global EPC, infrastructure, and enterprise commercial evaluation.</p>
-      <p class="font-mono text-emerald-500/80">Local Storage Active • Fully Offline Capable</p>
-    </div>
-  </footer>
-
-  <script>
-    const PRO_STATUS_KEY = "qc_pro_unlocked_multicurrency";
-    const CHECKOUT_PORTAL_URL = "https://buy.stripe.com/test_your_usd_link_here";
-
-    function isProUser() {
-      return localStorage.getItem(PRO_STATUS_KEY) === "true";
-    }
-
-    function triggerPaywall(featureName) {
-      const proceed = confirm(
-        "🔒 QuoteCompare Pro Feature: " + featureName + "\n\n" +
-        "Upgrade to Enterprise Tier to access:\n" +
-        "• Unlimited Multi-Currency Pairs (GCC & Asia)\n" +
-        "• Executive Tender Board Sign-Off Export (PDF)\n" +
-        "• Turnkey Landed Cost Normalization\n\n" +
-        "Click OK to unlock."
-      );
-      if (proceed) window.open(CHECKOUT_PORTAL_URL, "_blank");
-    }
-
-    function handleExportPDF() {
-      if (!isProUser()) {
-        triggerPaywall("Executive Tender Board PDF Memo Export");
-        return;
-      }
-      const d = new Date();
-      const printDateEl = document.getElementById("printDate");
-      if (printDateEl) {
-        printDateEl.textContent = "Evaluation Timestamp: " + d.toLocaleDateString() + " " + d.toLocaleTimeString
+        <div class="border border
