@@ -116,5 +116,41 @@
     // Initialize application on load
     bootApp();
   </script>
+  <!-- Monetization / Paywall Modal -->
+<div id="proPaywallModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
+  <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl shadow-emerald-500/10">
+    <div class="space-y-1">
+      <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded font-mono font-bold">PRO UPGRADE</span>
+      <h3 class="text-lg font-bold text-white">Unlock Executive Tender Memos</h3>
+      <p class="text-xs text-slate-400">Generate unwatermarked, ISO-compliant board evaluation packs and export to editable Excel sheets.</p>
+    </div>
+
+    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2 text-xs">
+      <div class="flex items-center gap-2 text-slate-300">
+        <span class="text-emerald-400 font-bold">✓</span> White-label boardroom memo (No QC Watermark)
+      </div>
+      <div class="flex items-center gap-2 text-slate-300">
+        <span class="text-emerald-400 font-bold">✓</span> Unlimited supplier comparisons (beyond 3 bids)
+      </div>
+      <div class="flex items-center gap-2 text-slate-300">
+        <span class="text-emerald-400 font-bold">✓</span> 1-Click Excel / CSV Raw Matrix Export
+      </div>
+      <div class="flex items-center gap-2 text-slate-300">
+        <span class="text-emerald-400 font-bold">✓</span> Priority live FX central bank feeds
+      </div>
+    </div>
+
+    <div class="pt-2 flex flex-col gap-2">
+      <!-- Replace checkout link with your live Stripe/Lemon Squeezy URL -->
+      <a href="https://yourbrand.lemonsqueezy.com/buy/YOUR_CHECKOUT_ID" target="_blank" class="w-full text-center bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-lg text-xs shadow-lg shadow-emerald-600/30 transition">
+        Unlock Pro Access — $49 One-Time
+      </a>
+      <button onclick="document.getElementById('proPaywallModal').classList.add('hidden')" class="text-xs text-slate-400 hover:text-slate-200 py-1">
+        Continue with free watermarked version
+      </button>
+    </div>
+  </div>
+</div>
+          
 </body>
 </html>
